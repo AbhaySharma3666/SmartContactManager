@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>This is services page</h1>
+    <hr>
+    <!-- fragment insert -->
+     <div class="host-tag" th:insert="~{base :: parent('service one','service two')}"></div>
+
+    <!-- fragment replace -->
+    <div class="host-tag" th:replace="~{base :: parent(,'service two')}"></div>
+</body>
+</html>
