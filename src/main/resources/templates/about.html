@@ -1,16 +1,16 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" th:replace="~{base :: parent(~{::#content}, ~{::title}, ~{::script})}">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>About Page</title>
 </head>
 <body>
-    <h1>This is about page</h1>
-    <hr>
-    <!-- fragment insert -->
-     <div class="host-tag" th:insert="~{base :: parent(~{:: p})}">
-        <p>This is dynamic content</p>
-     </div>
+    <div id="content">
+        <h1>Welcom to about Page</h1>
+        <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Cupiditate, libero.</p>
+    </div>
+    <script>
+        console.log("about page");
+        
+    </script>
 </body>
 </html>

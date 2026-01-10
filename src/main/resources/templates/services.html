@@ -1,17 +1,17 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" th:replace="~{base :: parent(~{::#content},~{::title}, ~{::script})}">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Services Page</title>
 </head>
 <body>
-    <h1>This is services page</h1>
-    <hr>
-    <!-- fragment insert -->
-     <div class="host-tag" th:insert="~{base :: parent('service one','service two')}"></div>
-
-    <!-- fragment replace -->
-    <div class="host-tag" th:replace="~{base :: parent(,'service two')}"></div>
+    <div id="content">
+        <h1>Welcom to section Page</h1>
+        <h2>Services offered by SCM</h2>
+        <p>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Sit, voluptatum.</p>
+    </div>
+    <script>
+        console.log("Service Page");
+        
+    </script>
 </body>
 </html>

@@ -1,34 +1,15 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" th:replace="~{base :: parent(~{::#content}, ~{::title}, ~{::script})}">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link href="https://cdn.jsdelivr.net/npm/flowbite@4.0.1/dist/flowbite.min.css" rel="stylesheet" />
-
-    <link rel="stylesheet" th:href="@{/css/output.css}" />
-    <style>
-        .container {
-            margin: auto;
-            width: 50%;
-            padding: 30px;
-            background: #e2e2e2;
-        }
-    </style>
+    <title>Home Page</title>
 </head>
 <body>
-    <div class="bg-gray-200 w-1/2 p-4 flex flex-col items-center space-y-3 mx-auto mt-4">
-        <h1 class="text-2xl font-bold" data-th:text="${name}">Welcome to home page</h1>
-        <p class="text-xl text-gray-700">GithubRepo : <span th:text="${githubRepo}"></span></p>
-        <p>Github Link : <a data-th-href="${githubRepo}" target="_blank">Click here to open</a></p>
-        <p class="text-gray-600">Lorem ipsum dolor, sit amet consectetur adipisicing elit. Asperiores neque, cum, deleniti accusamus nam tempore odio dolores veritatis dolorum, autem eaque sit. Voluptate, id! Odio libero vero magnam eos pariatur?</p>
-
-        <div>
-            <button class="px-3 py-3 rounded bg-blue-700 text-white hover:bg-blue-600">Click Here</button>
-        </div>
+    <div id="content">
+        <h1>Welcome to Home Page</h1>
+        <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Cupiditate, libero.</p>
     </div>
-    
-
-    <script src="https://cdn.jsdelivr.net/npm/flowbite@4.0.1/dist/flowbite.min.js"></script>
+    <script>
+        console.log("home page");
+    </script>
 </body>
 </html>
