@@ -1,2 +1,5 @@
 /* ./src/main/resources/static/input.css */
 @import "tailwindcss";
+
+/* stylelint-disable-next-line at-rule-no-unknown */
+@variant dark (.dark &);
