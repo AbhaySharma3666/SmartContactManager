@@ -126,6 +126,11 @@ public DaoAuthenticationProvider authenticationProvider() {
             logoutForm.logoutSuccessUrl("/login?logout=true");
         });
 
+        // Prevent back button after logout
+        httpSecurity.headers(headers -> headers
+            .cacheControl(cache -> cache.disable())
+        );
+
         return httpSecurity.build();
 
     }
