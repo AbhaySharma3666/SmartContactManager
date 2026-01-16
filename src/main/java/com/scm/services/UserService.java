@@ -5,7 +5,7 @@ import java.util.Optional;
 
 import com.scm.entities.User;
 
-public interface UserServices {
+public interface UserService {
 
     User saveUser(User user);
 
@@ -24,5 +24,5 @@ public interface UserServices {
     User getUserByEmail(String email);
 
     // add more methods here related user service[logic]
-    
+
 }

@@ -1,16 +1,100 @@
 <!DOCTYPE html>
-<html lang="en" th:replace="~{base :: parent(~{::#content}, ~{::title}, ~{::script})}">
+<html
+  lang="en"
+  th:replace="~{base :: parent(~{::#content},~{::title},~{::script})}"
+>
 <head>
-    <title>About Page</title>
+  <title>About • Smart Contact Manager</title>
 </head>
+
 <body>
-    <div id="content">
-        <h1>Welcom to about Page</h1>
-        <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Cupiditate, libero.</p>
+<div id="content">
+
+  <!-- HERO -->
+  <section class="bg-gradient-to-br from-indigo-600 via-blue-600 to-cyan-600 dark:from-indigo-900 dark:via-blue-900 dark:to-gray-950 text-white py-24">
+    <div class="container mx-auto px-6 text-center">
+      <h1 class="text-5xl font-extrabold mb-4">About Smart Contact Manager</h1>
+      <p class="text-lg text-white/90 max-w-3xl mx-auto">
+        A modern, secure, and scalable solution designed to simplify how you manage contacts.
+      </p>
     </div>
-    <script>
-        console.log("about page");
-        
-    </script>
+  </section>
+
+  <!-- ABOUT CONTENT -->
+  <section class="py-24 bg-gray-50 dark:bg-gray-900">
+    <div class="container mx-auto px-6 max-w-5xl">
+
+      <div class="mb-16 text-center">
+        <h2 class="text-4xl font-bold text-gray-900 dark:text-white mb-4">
+          Our Mission
+        </h2>
+        <p class="text-gray-600 dark:text-gray-400 text-lg">
+          To provide professionals and businesses with a secure, reliable, and easy-to-use contact management platform.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+
+        <!-- Left Content -->
+        <div>
+          <h3 class="text-2xl font-semibold text-gray-900 dark:text-white mb-4">
+            Why Smart Contact Manager?
+          </h3>
+          <p class="text-gray-600 dark:text-gray-400 mb-4">
+            Smart Contact Manager helps individuals and organizations organize, secure, and access their contacts efficiently.
+            Built using modern technologies, it ensures performance, scalability, and data protection.
+          </p>
+          <p class="text-gray-600 dark:text-gray-400">
+            Whether you are a freelancer, entrepreneur, or part of a growing team, SCM adapts to your workflow.
+          </p>
+        </div>
+
+        <!-- Right Highlights -->
+        <div class="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700">
+          <ul class="space-y-4">
+            <li class="flex items-start gap-3">
+              <span class="text-indigo-600 dark:text-indigo-400 text-xl">✔</span>
+              <span class="text-gray-700 dark:text-gray-300">Secure authentication with OAuth & encryption</span>
+            </li>
+            <li class="flex items-start gap-3">
+              <span class="text-indigo-600 dark:text-indigo-400 text-xl">✔</span>
+              <span class="text-gray-700 dark:text-gray-300">Cloud-based access across all devices</span>
+            </li>
+            <li class="flex items-start gap-3">
+              <span class="text-indigo-600 dark:text-indigo-400 text-xl">✔</span>
+              <span class="text-gray-700 dark:text-gray-300">Clean UI with dark mode support</span>
+            </li>
+            <li class="flex items-start gap-3">
+              <span class="text-indigo-600 dark:text-indigo-400 text-xl">✔</span>
+              <span class="text-gray-700 dark:text-gray-300">Built with Spring Boot & modern web technologies</span>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="py-20 bg-gray-900 text-white text-center">
+    <div class="container mx-auto px-6">
+      <h2 class="text-4xl font-extrabold mb-4">
+        Ready to Experience Smart Contact Management?
+      </h2>
+      <p class="text-gray-300 max-w-2xl mx-auto mb-8">
+        Create your free account and start managing your contacts with confidence.
+      </p>
+      <a data-th-href="@{'/register'}"
+         class="inline-block bg-indigo-600 px-10 py-4 rounded-xl font-bold text-lg hover:bg-indigo-500 transition shadow-lg">
+        Get Started Free
+      </a>
+    </div>
+  </section>
+
+</div>
+
+<script>
+  console.log("About page loaded");
+</script>
 </body>
 </html>

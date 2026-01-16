@@ -1,90 +1,90 @@
-package com.scm.contollers;
-
-import com.scm.SmartContactManagerApplication;
-import com.scm.entities.User;
-import com.scm.forms.UserForm;
-import com.scm.helpers.Message;
-import com.scm.helpers.MessageType;
-import com.scm.services.UserServices;
-
-import jakarta.servlet.http.HttpSession;
-import jakarta.validation.Valid;
+package com.scm.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+
+import com.scm.entities.User;
+import com.scm.forms.UserForm;
+import com.scm.helpers.Message;
+import com.scm.helpers.MessageType;
+import com.scm.services.UserService;
+
+import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 
 @Controller
 public class PageController {
 
     @Autowired
-    private UserServices userServices;
+    private UserService userService;
 
-    private final SmartContactManagerApplication smartContactManagerApplication;
-
-    PageController(SmartContactManagerApplication smartContactManagerApplication) {
-        this.smartContactManagerApplication = smartContactManagerApplication;
+    @GetMapping("/")
+    public String index() {
+        return "redirect:/home";
     }
 
-    @GetMapping("/home")
+    @RequestMapping("/home")
     public String home(Model model) {
-        System.out.println("========================");
-        System.out.println("Home Page handler");
-        System.out.println("========================");
-
+        System.out.println("Home page handler");
         // sending data to view
         model.addAttribute("name", "Substring Technologies");
-        model.addAttribute("githubRepo", "https://github.com/AbhaySharma3666");
+        model.addAttribute("youtubeChannel", "Learn Code With Durgesh");
+        model.addAttribute("githubRepo", "https://github.com/learncodewithdurgesh/");
         return "home";
     }
 
     // about route
-    @GetMapping("/about")
-    public String aboutPage() {
+
+    @RequestMapping("/about")
+    public String aboutPage(Model model) {
+        model.addAttribute("isLogin", true);
         System.out.println("About page loading");
         return "about";
     }
 
-    // services route
-    @GetMapping("/services")
+    // services
+
+    @RequestMapping("/services")
     public String servicesPage() {
-        System.out.println("Services page loading");
+        System.out.println("services page loading");
         return "services";
     }
 
-    // contact route
+    // contact page
+
     @GetMapping("/contact")
     public String contact() {
-        System.out.println("contact page loading");
         return new String("contact");
     }
 
-    // login route
+    // this is showing login page
     @GetMapping("/login")
     public String login() {
-        System.out.println("login page loading");
         return new String("login");
     }
 
-    // register route
+    // registration page
     @GetMapping("/register")
     public String register(Model model) {
+
         UserForm userForm = new UserForm();
-        // default value bhi daal sakte ha
-        // userForm.setName("Abhay");
-        // userForm.setAbout("This is about : write something about yourself");
+        // default data bhi daal sakte hai
+        // userForm.setName("Durgesh");
+        // userForm.setAbout("This is about : Write something about yourself");
         model.addAttribute("userForm", userForm);
 
         return "register";
     }
 
     // processing register
+
     @RequestMapping(value = "/do-register", method = RequestMethod.POST)
     public String processRegister(@Valid @ModelAttribute UserForm userForm, BindingResult rBindingResult,
             HttpSession session) {
@@ -125,7 +125,7 @@ public class PageController {
         user.setProfilePic(
                 "https://www.learncodewithdurgesh.com/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Fdurgesh_sir.35c6cb78.webp&w=1920&q=75");
 
-        User savedUser = userServices.saveUser(user);
+        User savedUser = userService.saveUser(user);
 
         System.out.println("user saved :");
 

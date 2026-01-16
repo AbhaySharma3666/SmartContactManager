@@ -1,7 +1,5 @@
 package com.scm.entities;
 
-import org.springframework.aot.generate.GeneratedTypeReference;
-
 import jakarta.annotation.Generated;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

@@ -1,15 +1,153 @@
 <!DOCTYPE html>
-<html lang="en" th:replace="~{base :: parent(~{::#content}, ~{::title}, ~{::script})}">
+<html
+  lang="en"
+  th:replace="~{base :: parent(~{::#content},~{::title},~{::script})}"
+>
 <head>
-    <title>Contact Page</title>
+  <title>Contact Us • Smart Contact Manager</title>
 </head>
+
 <body>
-    <div id="content">
-        <h1>Welcome to Contact Page</h1>
-        <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Cupiditate, libero.</p>
+<div id="content">
+
+  <!-- HERO -->
+  <section class="bg-gradient-to-br from-indigo-600 via-blue-600 to-cyan-600
+                  dark:from-indigo-900 dark:via-blue-900 dark:to-gray-950
+                  text-white py-24">
+    <div class="container mx-auto px-6 text-center">
+      <h1 class="text-5xl font-extrabold mb-4">Contact Us</h1>
+      <p class="text-lg text-white/90 max-w-2xl mx-auto">
+        Have questions or need support? We’re here to help.
+      </p>
     </div>
-    <script>
-        console.log("contact page");
-    </script>
+  </section>
+
+  <!-- CONTACT SECTION -->
+  <section class="py-24 bg-gray-50 dark:bg-gray-900">
+    <div class="container mx-auto px-6 max-w-6xl">
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-start">
+
+        <!-- CONTACT FORM -->
+        <div class="bg-white dark:bg-gray-800 p-10 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700">
+
+          <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-6">
+            Send Us a Message
+          </h2>
+
+          <form class="space-y-6">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Full Name
+              </label>
+              <input type="text" placeholder="John Doe"
+                     class="w-full px-4 py-3 rounded-lg border border-gray-300
+                            dark:border-gray-600 dark:bg-gray-900
+                            dark:text-white focus:ring-2 focus:ring-indigo-500
+                            outline-none transition"/>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Email Address
+              </label>
+              <input type="email" placeholder="john@example.com"
+                     class="w-full px-4 py-3 rounded-lg border border-gray-300
+                            dark:border-gray-600 dark:bg-gray-900
+                            dark:text-white focus:ring-2 focus:ring-indigo-500
+                            outline-none transition"/>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Message
+              </label>
+              <textarea rows="5" placeholder="Write your message..."
+                        class="w-full px-4 py-3 rounded-lg border border-gray-300
+                               dark:border-gray-600 dark:bg-gray-900
+                               dark:text-white focus:ring-2 focus:ring-indigo-500
+                               outline-none transition"></textarea>
+            </div>
+
+            <button type="submit"
+                    class="w-full bg-indigo-600 text-white py-4 rounded-xl
+                           font-bold text-lg hover:bg-indigo-500 transition
+                           shadow-lg hover:shadow-xl cursor-pointer">
+              Send Message
+            </button>
+          </form>
+        </div>
+
+        <!-- CONTACT INFO -->
+        <div class="space-y-8">
+
+          <div class="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-lg
+                      border border-gray-200 dark:border-gray-700
+                      cursor-pointer transition-all duration-300
+                      hover:-translate-y-1 hover:shadow-xl">
+            <div class="flex items-center gap-4">
+              <div class="w-14 h-14 bg-indigo-600 rounded-xl flex items-center justify-center">
+                <i class="fas fa-envelope text-white text-xl"></i>
+              </div>
+              <div>
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+                  Email
+                </h3>
+                <p class="text-gray-600 dark:text-gray-400">
+                  support@smartcontactmanager.com
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-lg
+                      border border-gray-200 dark:border-gray-700
+                      cursor-pointer transition-all duration-300
+                      hover:-translate-y-1 hover:shadow-xl">
+            <div class="flex items-center gap-4">
+              <div class="w-14 h-14 bg-emerald-600 rounded-xl flex items-center justify-center">
+                <i class="fas fa-phone text-white text-xl"></i>
+              </div>
+              <div>
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+                  Phone
+                </h3>
+                <p class="text-gray-600 dark:text-gray-400">
+                  +91 98765 43210
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-lg
+                      border border-gray-200 dark:border-gray-700
+                      cursor-pointer transition-all duration-300
+                      hover:-translate-y-1 hover:shadow-xl">
+            <div class="flex items-center gap-4">
+              <div class="w-14 h-14 bg-purple-600 rounded-xl flex items-center justify-center">
+                <i class="fas fa-map-marker-alt text-white text-xl"></i>
+              </div>
+              <div>
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+                  Address
+                </h3>
+                <p class="text-gray-600 dark:text-gray-400">
+                  India • Remote First
+                </p>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<script>
+  console.log("Contact page loaded");
+</script>
 </body>
 </html>

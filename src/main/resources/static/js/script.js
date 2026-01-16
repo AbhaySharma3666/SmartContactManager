@@ -5,7 +5,6 @@ let currentTheme = getTheme();
 //initial -->
 
 document.addEventListener("DOMContentLoaded", () => {
-  console.log("DOM loaded, current theme:", currentTheme);
   changeTheme();
 });
 
@@ -16,11 +15,6 @@ function changeTheme() {
   changePageTheme(currentTheme, "");
   //set the listener to change theme button
   const changeThemeButton = document.querySelector("#theme_change_button");
-
-  if (!changeThemeButton) {
-    console.error("Theme button not found");
-    return;
-  }
 
   changeThemeButton.addEventListener("click", (event) => {
     let oldTheme = currentTheme;
@@ -50,26 +44,23 @@ function getTheme() {
 
 //change current page theme
 function changePageTheme(theme, oldTheme) {
-  console.log("Changing theme from", oldTheme, "to", theme);
-  setTheme(theme);
-  
+  //localstorage mein update karenge
+  setTheme(currentTheme);
+  //remove the current theme
+
   if (oldTheme) {
     document.querySelector("html").classList.remove(oldTheme);
   }
-  
+  //set the current theme
   document.querySelector("html").classList.add(theme);
-  console.log("HTML classes:", document.querySelector("html").className);
+
+  // change the text of button
+  document
+    .querySelector("#theme_change_button")
+    .querySelector("span").textContent = theme == "light" ? "Dark" : "Light";
   
-  const button = document.querySelector("#theme_change_button");
-  const icon = document.querySelector("#theme_icon");
-  
-  if (theme === "light") {
-    button.querySelector("span").textContent = "Dark";
-    icon.className = "fa-solid fa-moon";
-  } else {
-    button.querySelector("span").textContent = "Light";
-    icon.className = "fa-regular fa-sun";
-  }
+  // Add smooth transition effect
+  document.body.style.transition = "background-color 0.3s ease, color 0.3s ease";
 }
 
-//change page change theme 
+//change page change theme
