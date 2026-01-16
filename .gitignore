@@ -1,5 +1,6 @@
 HELP.md
 target/
+info.txt
 .mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
@@ -33,3 +34,4 @@ build/
 .vscode/
 
 echo src/main/resources/application.properties >> .gitignor
+
