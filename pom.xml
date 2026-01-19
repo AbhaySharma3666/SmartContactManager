@@ -115,6 +115,13 @@
 			<groupId>org.thymeleaf.extras</groupId>
 			<artifactId>thymeleaf-extras-springsecurity6</artifactId>
 		</dependency>
+
+		<!-- Twilio SDK for SMS -->
+		<dependency>
+			<groupId>com.twilio.sdk</groupId>
+			<artifactId>twilio</artifactId>
+			<version>10.0.0</version>
+		</dependency>
 		
 	</dependencies>
 

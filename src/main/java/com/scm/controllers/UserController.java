@@ -19,6 +19,7 @@ import com.scm.helpers.Helper;
 import com.scm.helpers.Message;
 import com.scm.helpers.MessageType;
 import com.scm.services.ImageService;
+import com.scm.services.SmsService;
 import com.scm.services.UserService;
 
 import jakarta.servlet.http.HttpSession;
@@ -38,6 +39,9 @@ public class UserController {
 
     @Autowired
     private ImageService imageService;
+
+    @Autowired
+    private SmsService smsService;
 
     private Map<String, String> otpStore = new HashMap<>();
 
@@ -122,10 +126,21 @@ public class UserController {
         try {
             String otp = String.format("%06d", new Random().nextInt(999999));
             otpStore.put(phoneNumber, otp);
-            logger.info("OTP for {}: {}", phoneNumber, otp);
-            response.put("success", true);
-            response.put("message", "OTP sent successfully. Check console: " + otp);
+            
+            String message = "Your OTP for Smart Contact Manager is: " + otp + ". Valid for 5 minutes.";
+            boolean smsSent = smsService.sendSms(phoneNumber, message);
+            
+            if (smsSent) {
+                logger.info("OTP sent to {}", phoneNumber);
+                response.put("success", true);
+                response.put("message", "OTP sent successfully to " + phoneNumber);
+            } else {
+                logger.warn("SMS service not configured. OTP: {}", otp);
+                response.put("success", true);
+                response.put("message", "OTP: " + otp + " (SMS service not configured)");
+            }
         } catch (Exception e) {
+            logger.error("Error sending OTP", e);
             response.put("success", false);
             response.put("message", "Failed to send OTP");
         }
