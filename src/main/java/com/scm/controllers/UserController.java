@@ -90,8 +90,15 @@ public class UserController {
                     form.getProfileImage().getOriginalFilename(), 
                     form.getProfileImage().getSize());
                 try {
+                    // Delete old image if exists
+                    String oldProfilePic = user.getProfilePic();
+                    if (oldProfilePic != null && !oldProfilePic.isEmpty() && !oldProfilePic.contains("unknow_user.png")) {
+                        String oldPublicId = oldProfilePic.substring(oldProfilePic.lastIndexOf("/") + 1, oldProfilePic.lastIndexOf("."));
+                        imageService.deleteImage(oldPublicId);
+                        logger.info("Deleted old profile image: {}", oldPublicId);
+                    }
+                    
                     // Create unique filename with timestamp
-                    String originalFilename = form.getProfileImage().getOriginalFilename();
                     String uniqueFilename = "profile_" + user.getUserId() + "_" + System.currentTimeMillis();
                     
                     String imageUrl = imageService.uploadImage(form.getProfileImage(), uniqueFilename);
