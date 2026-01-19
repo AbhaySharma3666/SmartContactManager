@@ -27,13 +27,25 @@ public class SmsServiceImpl implements SmsService {
     @Override
     public boolean sendSms(String phoneNumber, String messageText) {
         try {
+            logger.info("Attempting to send SMS to: {}", phoneNumber);
+            logger.info("Twilio Account SID configured: {}", !accountSid.isEmpty());
+            logger.info("Twilio Auth Token configured: {}", !authToken.isEmpty());
+            logger.info("Twilio Phone Number configured: {}", fromPhoneNumber);
+            
             // Check if Twilio is configured
             if (accountSid.isEmpty() || authToken.isEmpty() || fromPhoneNumber.isEmpty()) {
                 logger.warn("Twilio not configured. SMS not sent. Message: {}", messageText);
                 return false;
             }
 
+            // Validate phone number format
+            if (!phoneNumber.startsWith("+")) {
+                logger.error("Phone number must be in international format starting with +");
+                return false;
+            }
+
             Twilio.init(accountSid, authToken);
+            logger.info("Twilio initialized successfully");
             
             Message message = Message.creator(
                     new PhoneNumber(phoneNumber),
@@ -41,10 +53,11 @@ public class SmsServiceImpl implements SmsService {
                     messageText)
                 .create();
 
-            logger.info("SMS sent successfully to {}. SID: {}", phoneNumber, message.getSid());
+            logger.info("SMS sent successfully to {}. SID: {}, Status: {}", 
+                phoneNumber, message.getSid(), message.getStatus());
             return true;
         } catch (Exception e) {
-            logger.error("Failed to send SMS to {}: {}", phoneNumber, e.getMessage());
+            logger.error("Failed to send SMS to {}: {}", phoneNumber, e.getMessage(), e);
             return false;
         }
     }

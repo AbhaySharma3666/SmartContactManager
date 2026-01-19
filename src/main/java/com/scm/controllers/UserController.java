@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.scm.entities.User;
+import com.scm.forms.FeedbackForm;
 import com.scm.forms.UserUpdateForm;
 import com.scm.helpers.Helper;
 import com.scm.helpers.Message;
@@ -21,6 +22,8 @@ import com.scm.helpers.MessageType;
 import com.scm.services.ImageService;
 import com.scm.services.SmsService;
 import com.scm.services.UserService;
+import com.scm.entities.Feedback;
+import com.scm.repositories.FeedbackRepo;
 
 import jakarta.servlet.http.HttpSession;
 import java.util.HashMap;
@@ -42,6 +45,9 @@ public class UserController {
 
     @Autowired
     private SmsService smsService;
+
+    @Autowired
+    private FeedbackRepo feedbackRepo;
 
     private Map<String, String> otpStore = new HashMap<>();
 
@@ -126,23 +132,25 @@ public class UserController {
         try {
             String otp = String.format("%06d", new Random().nextInt(999999));
             otpStore.put(phoneNumber, otp);
+            logger.info("Generated OTP for {}: {}", phoneNumber, otp);
             
-            String message = "Your OTP for Smart Contact Manager is: " + otp + ". Valid for 5 minutes.";
+            String message = "Your OTP for Smart Contact Manager is: " + otp + " Valid for 5 minutes.";
             boolean smsSent = smsService.sendSms(phoneNumber, message);
             
             if (smsSent) {
-                logger.info("OTP sent to {}", phoneNumber);
+                logger.info("OTP sent successfully to {}", phoneNumber);
                 response.put("success", true);
                 response.put("message", "OTP sent successfully to " + phoneNumber);
             } else {
-                logger.warn("SMS service not configured. OTP: {}", otp);
+                logger.warn("SMS service not configured. Showing OTP in response for testing.");
                 response.put("success", true);
-                response.put("message", "OTP: " + otp + " (SMS service not configured)");
+                response.put("message", "SMS service not configured. Your OTP is: " + otp);
+                response.put("otp", otp); // For testing without SMS
             }
         } catch (Exception e) {
             logger.error("Error sending OTP", e);
             response.put("success", false);
-            response.put("message", "Failed to send OTP");
+            response.put("message", "Failed to send OTP: " + e.getMessage());
         }
         return response;
     }
@@ -180,5 +188,43 @@ public class UserController {
     // user edit contact
 
     // user delete contact
+
+    // Feedback page
+    @GetMapping("/feedback")
+    public String feedbackPage(Model model) {
+        model.addAttribute("feedbackForm", new FeedbackForm());
+        return "user/feedback";
+    }
+
+    // Submit feedback
+    @PostMapping("/feedback")
+    public String submitFeedback(@ModelAttribute FeedbackForm form, HttpSession session, Authentication authentication) {
+        try {
+            String username = Helper.getEmailOfLoggedInUser(authentication);
+            User user = userService.getUserByEmail(username);
+
+            Feedback feedback = new Feedback();
+            feedback.setFeedbackId(java.util.UUID.randomUUID().toString());
+            feedback.setSubject(form.getSubject());
+            feedback.setMessage(form.getMessage());
+            feedback.setRating(form.getRating());
+            feedback.setCreatedAt(java.time.LocalDateTime.now());
+            feedback.setUser(user);
+
+            feedbackRepo.save(feedback);
+
+            session.setAttribute("message", Message.builder()
+                    .content("Thank you for your feedback!")
+                    .type(MessageType.green)
+                    .build());
+        } catch (Exception e) {
+            logger.error("Error submitting feedback", e);
+            session.setAttribute("message", Message.builder()
+                    .content("Failed to submit feedback")
+                    .type(MessageType.red)
+                    .build());
+        }
+        return "redirect:/user/feedback";
+    }
 
 }

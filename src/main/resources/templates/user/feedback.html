@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en" th:replace="~{base :: parent(~{::#content},~{::title},~{::script})}">
+
+<head>
+  <title>Feedback | SCM</title>
+</head>
+
+<body>
+  <div id="content">
+    <div th:if="${loggedInUser}">
+      <div data-th-replace="~{user/sidebar :: sidebar}"></div>
+    </div>
+
+    <div class="sm:pl-64 pt-20">
+      <div class="flex items-center justify-center md:pt-16 p-4">
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl max-w-2xl w-full p-8">
+          <div class="mb-6">
+            <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+              <i class="fa-solid fa-comment-dots text-blue-600"></i> Send Feedback
+            </h2>
+            <p class="text-gray-600 dark:text-gray-400">We'd love to hear your thoughts!</p>
+          </div>
+
+          <form th:action="@{/user/feedback}" method="post" th:object="${feedbackForm}">
+            <!-- Subject -->
+            <div class="mb-4">
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Subject
+              </label>
+              <input type="text" th:field="*{subject}" required
+                     class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                     placeholder="Brief description of your feedback">
+            </div>
+
+            <!-- Rating -->
+            <div class="mb-4">
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Rating
+              </label>
+              <div class="flex gap-2" id="ratingStars">
+                <input type="hidden" th:field="*{rating}" id="ratingValue" value="0">
+                <i class="fa-regular fa-star text-3xl cursor-pointer text-gray-400 hover:text-yellow-500" data-rating="1"></i>
+                <i class="fa-regular fa-star text-3xl cursor-pointer text-gray-400 hover:text-yellow-500" data-rating="2"></i>
+                <i class="fa-regular fa-star text-3xl cursor-pointer text-gray-400 hover:text-yellow-500" data-rating="3"></i>
+                <i class="fa-regular fa-star text-3xl cursor-pointer text-gray-400 hover:text-yellow-500" data-rating="4"></i>
+                <i class="fa-regular fa-star text-3xl cursor-pointer text-gray-400 hover:text-yellow-500" data-rating="5"></i>
+              </div>
+            </div>
+
+            <!-- Message -->
+            <div class="mb-6">
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Message
+              </label>
+              <textarea th:field="*{message}" rows="6" required
+                        class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                        placeholder="Share your experience, suggestions, or report issues..."></textarea>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="flex gap-3">
+              <button type="submit"
+                      class="flex-1 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors">
+                <i class="fa-solid fa-paper-plane"></i> Submit Feedback
+              </button>
+              <button type="reset"
+                      class="px-6 py-3 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700">
+                Reset
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <script data-th-src="@{'/js/feedback.js'}"></script>
+  </div>
+</body>
+</html>

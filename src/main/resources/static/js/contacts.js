@@ -113,6 +113,7 @@ async function deleteContact(id) {
     icon: "warning",
     showCancelButton: true,
     confirmButtonText: "Delete",
+    theme: 'auto'
   }).then((result) => {
     /* Read more about isConfirmed, isDenied below */
     if (result.isConfirmed) {
@@ -172,17 +173,11 @@ document.getElementById('email_form')?.addEventListener('submit', async function
         title: 'Success!',
         text: 'Email sent successfully',
         icon: 'success',
-        // confirmButtonText: 'OK'
-        showCancelButton: false,
-        timer: 2000,
-  position: 'top-end',
-  toast: true,
-  background: '#10b981',
-  color: '#fff',
-  iconColor: '#fff',
-  customClass: {
-    popup: 'colored-toast'
-  }
+        timer: 3000,
+        position: 'top-end',
+        toast: true,
+        showConfirmButton: false,
+        theme: 'auto'
       });
       closeEmailModal();
     } else {
@@ -194,9 +189,11 @@ document.getElementById('email_form')?.addEventListener('submit', async function
       title: 'Error!',
       text: 'Failed to send email. Please try again.',
       icon: 'error',
-      // confirmButtonText: 'OK'
-      showCancelButton: false,
-      timer: 2000
+      timer: 3000,
+      position: 'top-end',
+      toast: true,
+      showConfirmButton: false,
+      theme: 'auto'
     });
   } finally {
     // Re-enable button and restore text

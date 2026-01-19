@@ -131,13 +131,15 @@
 
             <!-- Phone -->
             <div class="mb-4">
-              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Phone Number</label>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Phone Number (with country code, e.g., +919876543210)</label>
               <div class="flex gap-2">
-                <input type="text" id="phoneInput" name="phoneNumber" data-th-value="${loggedInUser.phoneNumber}"
+                <input type="tel" id="phoneInput" name="phoneNumber" data-th-value="${loggedInUser.phoneNumber}" 
+                       placeholder="+919876543210"
                        class="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
                 <button type="button" onclick="sendOTP()" data-th-if="${!loggedInUser.phoneVerified}"
-                        class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg">Send OTP</button>
+                        class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg whitespace-nowrap">Send OTP</button>
               </div>
+              <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Format: +[country code][number]</p>
             </div>
 
             <!-- OTP Verification -->
@@ -174,70 +176,6 @@
       </div>
     </div>
 
-    <script>
-      let originalPhone = '[[${loggedInUser.phoneNumber}]]';
-
-      function openEditModal() {
-        document.getElementById('editModal').classList.remove('hidden');
-      }
-
-      function closeEditModal() {
-        document.getElementById('editModal').classList.add('hidden');
-      }
-
-      function previewFile(input) {
-        if (input.files && input.files[0]) {
-          const reader = new FileReader();
-          reader.onload = function(e) {
-            document.getElementById('previewImage').src = e.target.result;
-          }
-          reader.readAsDataURL(input.files[0]);
-        }
-      }
-
-      function sendOTP() {
-        const phone = document.getElementById('phoneInput').value;
-        if (!phone) {
-          Swal.fire('Error', 'Please enter phone number', 'error');
-          return;
-        }
-
-        fetch('/user/profile/send-otp', {
-          method: 'POST',
-          headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-          body: 'phoneNumber=' + encodeURIComponent(phone)
-        })
-        .then(res => res.json())
-        .then(data => {
-          if (data.success) {
-            document.getElementById('otpSection').classList.remove('hidden');
-            Swal.fire('Success', data.message, 'success');
-          } else {
-            Swal.fire('Error', data.message, 'error');
-          }
-        });
-      }
-
-      function verifyOTP() {
-        const phone = document.getElementById('phoneInput').value;
-        const otp = document.getElementById('otpInput').value;
-
-        fetch('/user/profile/verify-otp', {
-          method: 'POST',
-          headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-          body: 'phoneNumber=' + encodeURIComponent(phone) + '&otp=' + encodeURIComponent(otp)
-        })
-        .then(res => res.json())
-        .then(data => {
-          if (data.success) {
-            Swal.fire('Success', data.message, 'success').then(() => location.reload());
-          } else {
-            Swal.fire('Error', data.message, 'error');
-          }
-        });
-      }
-
-      console.log("this is profile page");
-    </script>
+    <script data-th-src="@{'/js/profile.js'}"></script>
 </body>
 </html>
