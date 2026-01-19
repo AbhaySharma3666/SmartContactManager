@@ -31,6 +31,9 @@ const instanceOptions = {
 
 const contactModal = new Modal(viewContactModal, options, instanceOptions);
 
+let currentContactEmail = '';
+let currentContactName = '';
+
 function openContactModal() {
   contactModal.show();
 }
@@ -39,19 +42,38 @@ function closeContactModal() {
   contactModal.hide();
 }
 
+// Email Modal
+const composeEmailModal = document.getElementById("compose_email_modal");
+const emailModalInstance = new Modal(composeEmailModal, options, { id: "compose_email_modal", override: true });
+
+function openEmailModal() {
+  closeContactModal();
+  document.getElementById('email_recipient_name').textContent = currentContactName;
+  emailModalInstance.show();
+}
+
+function closeEmailModal() {
+  emailModalInstance.hide();
+  document.getElementById('email_form').reset();
+}
+
 async function loadContactdata(id) {
   console.log(id);
   try {
     const data = await (await fetch(`${baseURL}/api/contacts/${id}`)).json();
     console.log(data);
-    
+
+    currentContactEmail = data.email;
+    currentContactName = data.name;
+
     document.querySelector("#contact_name").innerHTML = data.name;
     document.querySelector("#contact_email").innerHTML = data.email;
-    document.querySelector("#contact_image").src = data.picture;
+    const contactImage = document.querySelector("#contact_image");
+    contactImage.src = data.picture || '/images/unknow_user.png';
     document.querySelector("#contact_address").innerHTML = data.address || 'Not provided';
     document.querySelector("#contact_phone").innerHTML = data.phoneNumber;
     document.querySelector("#contact_about").innerHTML = data.description || 'No description available';
-    
+
     // Handle website link
     const websiteContainer = document.querySelector("#website_container");
     const websiteLink = document.querySelector("#contact_website");
@@ -62,7 +84,7 @@ async function loadContactdata(id) {
     } else {
       websiteContainer.style.display = 'none';
     }
-    
+
     // Handle LinkedIn link
     const linkedinContainer = document.querySelector("#linkedin_container");
     const linkedinLink = document.querySelector("#contact_linkedIn");
@@ -73,11 +95,10 @@ async function loadContactdata(id) {
     } else {
       linkedinContainer.style.display = 'none';
     }
-    
+
     // Set action buttons
     document.querySelector("#call_button").href = `tel:${data.phoneNumber}`;
-    document.querySelector("#email_button").href = `mailto:${data.email}`;
-    
+
     openContactModal();
   } catch (error) {
     console.log("Error: ", error);
@@ -116,3 +137,70 @@ async function toggleFavorite(id, event) {
     console.log("Error: ", error);
   }
 }
+
+// Handle email form submission
+document.getElementById('email_form')?.addEventListener('submit', async function (e) {
+  e.preventDefault();
+
+  const sendButton = document.getElementById('send_email_button');
+  const originalText = sendButton.textContent;
+
+  // Disable button and change text
+  sendButton.disabled = true;
+  sendButton.textContent = 'Sending...';
+
+  const subject = document.getElementById('email_subject').value;
+  const message = document.getElementById('email_message').value;
+  const attachment = document.getElementById('email_attachment').files[0];
+
+  const formData = new FormData();
+  formData.append('to', currentContactEmail);
+  formData.append('subject', subject);
+  formData.append('message', message);
+  if (attachment) {
+    formData.append('attachment', attachment);
+  }
+
+  try {
+    const response = await fetch(`${baseURL}/api/send-email`, {
+      method: 'POST',
+      body: formData
+    });
+
+    if (response.ok) {
+      Swal.fire({
+        title: 'Success!',
+        text: 'Email sent successfully',
+        icon: 'success',
+        // confirmButtonText: 'OK'
+        showCancelButton: false,
+        timer: 2000,
+  position: 'top-end',
+  toast: true,
+  background: '#10b981',
+  color: '#fff',
+  iconColor: '#fff',
+  customClass: {
+    popup: 'colored-toast'
+  }
+      });
+      closeEmailModal();
+    } else {
+      throw new Error('Failed to send email');
+    }
+  } catch (error) {
+    console.log('Error:', error);
+    Swal.fire({
+      title: 'Error!',
+      text: 'Failed to send email. Please try again.',
+      icon: 'error',
+      // confirmButtonText: 'OK'
+      showCancelButton: false,
+      timer: 2000
+    });
+  } finally {
+    // Re-enable button and restore text
+    sendButton.disabled = false;
+    sendButton.textContent = originalText;
+  }
+});

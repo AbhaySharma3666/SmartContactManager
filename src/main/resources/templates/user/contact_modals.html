@@ -1,5 +1,5 @@
 <div data-th-fragment="contact">
-  <!-- Main modal -->
+  <!-- View Contact Modal -->
   <div
     id="view_contact_modal"
     tabindex="-1"
@@ -24,7 +24,7 @@
         <div class="p-8 text-center">
           <!-- Profile Image -->
           <img
-            onerror="this.src='https://static-00.iconduck.com/assets.00/profile-default-icon-2048x2045-u3j7s5nj.png'"
+            onerror="this.src='/images/unknow_user.png'"
             id="contact_image"
             class="w-32 h-32 rounded-full mx-auto mb-4 object-cover border-4 border-gray-200 dark:border-gray-600"
             src=""
@@ -93,13 +93,12 @@
             >
               Call Contact
             </a>
-            <a
-              id="email_button"
-              href="#"
+            <button
+              onclick="openEmailModal()"
               class="px-6 py-2.5 bg-gray-900 text-white rounded-lg hover:bg-gray-800 dark:bg-gray-700 dark:hover:bg-gray-600 transition font-medium"
             >
               Email Contact
-            </a>
+            </button>
           </div>
         </div>
       </div>

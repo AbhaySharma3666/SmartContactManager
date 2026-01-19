@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html
-  class="dark"
   lang="en"
   th:fragment="parent(content,title,script)"
   xmlns:th="http://www.thymeleaf.org"
@@ -27,6 +26,11 @@
     />
   </head>
   <body class="dark:bg-gray-900 bg-gray-100 dark:text-white preload">
+    <script>
+      // Apply theme immediately to prevent flash
+      const theme = localStorage.getItem('theme') || 'light';
+      document.documentElement.classList.add(theme);
+    </script>
     <!-- commona header -->
 
     <!--  user is logged in : navbar -->
