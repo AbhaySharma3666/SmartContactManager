@@ -15,38 +15,228 @@
       <div data-th-replace="~{user/sidebar :: sidebar}"></div>
     </div>
 
-    <div class="sm:pl-64 pt-20" style="height: 1000px">
-      <div class="flex items-center justify-center md:pt-32 flex-col">
-        <!--  profie card -->
-        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg max-w-2xl w-full">
-          <div class="flex flex-col items-center">
-            <img 
-              crossorigin="anonymous"
-              onerror="this.onerror=null; this.src='/images/unknow_user.png'"
-              data-th-src="@{${loggedInUser.profilePic}}" src="/images/unknow_user.png"
-              alt="Profile Photo" class="w-44 h-44 rounded-full shadow-lg object-cover mb-4">
+    <div class="sm:pl-64 pt-20">
+      <div class="flex items-center justify-center md:pt-16 p-4">
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl max-w-3xl w-full overflow-hidden">
+          <!-- Header with gradient -->
+          <div class="bg-gradient-to-r from-blue-500 to-purple-600 h-32"></div>
+          
+          <!-- Profile Content -->
+          <div class="relative px-6 pb-6">
+            <!-- Profile Photo -->
+            <div class="flex justify-center -mt-16 mb-4">
+              <img 
+                crossorigin="anonymous"
+                onerror="this.onerror=null; this.src='/images/unknow_user.png'"
+                data-th-src="@{${loggedInUser.profilePic} + '?t=' + ${#dates.createNow().time}}" 
+                src="/images/unknow_user.png"
+                alt="Profile Photo" 
+                class="w-32 h-32 rounded-full border-4 border-white dark:border-gray-800 shadow-xl object-cover">
+            </div>
 
-            <h2 class="text-2xl font-semibold mb-2" data-th-text=${loggedInUser.name}>User Name</h2>
-            <p class="text-gray-600 dark:text-gray-400 mb-2" data-th-text="${loggedInUser.email}">
-              user.email@example.com</p>
-            <p class="text-gray-600 dark:text-gray-400 mb-2"
-              data-th-text="${loggedInUser.phoneNumber}">123-456-7890</p>
-            <p class="text-gray-600 dark:text-gray-400 mb-4 text-center"
-              data-th-text="${loggedInUser.about}">About the user...</p>
-            <div class="w-full flex justify-between">
-              <p class="text-sm text-gray-500 dark:text-gray-400">Email Verified: <span
-                  class="font-medium text-gray-700 dark:text-gray-300" id="email-verified"
-                  data-th-text="${loggedInUser.emailVerified ? 'YES':'NO'}">No</span></p>
-              <p class="text-sm text-gray-500 dark:text-gray-400">Phone Verified: <span
-                  class="font-medium text-gray-700 dark:text-gray-300" id="phone-verified"
-                  data-th-text="${loggedInUser.phoneVerified ? 'YES':'NO'}">No</span></p>
+            <!-- Edit Button -->
+            <div class="absolute top-4 right-6">
+              <button onclick="openEditModal()" class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors shadow-lg">
+                <i class="fa-solid fa-pen-to-square"></i>
+                <span>Edit Profile</span>
+              </button>
+            </div>
+
+            <!-- Name -->
+            <div class="text-center mb-6">
+              <h2 class="text-3xl font-bold text-gray-900 dark:text-white mb-2" data-th-text="${loggedInUser.name}">User Name</h2>
+            </div>
+
+            <!-- Info Grid -->
+            <div class="space-y-4">
+              <!-- Email -->
+              <div class="flex items-center gap-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                <div class="flex-shrink-0 w-10 h-10 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center">
+                  <i class="fa-solid fa-envelope text-blue-600 dark:text-blue-400"></i>
+                </div>
+                <div class="flex-1">
+                  <p class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide">Email</p>
+                  <p class="text-gray-900 dark:text-white font-medium" data-th-text="${loggedInUser.email}">user@example.com</p>
+                </div>
+                <span data-th-if="${loggedInUser.emailVerified}" class="px-3 py-1 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 text-xs font-semibold rounded-full">
+                  <i class="fa-solid fa-circle-check"></i> Verified
+                </span>
+                <span data-th-unless="${loggedInUser.emailVerified}" class="px-3 py-1 bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200 text-xs font-semibold rounded-full">
+                  <i class="fa-solid fa-circle-xmark"></i> Not Verified
+                </span>
+              </div>
+
+              <!-- Phone -->
+              <div class="flex items-center gap-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                <div class="flex-shrink-0 w-10 h-10 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center">
+                  <i class="fa-solid fa-phone text-green-600 dark:text-green-400"></i>
+                </div>
+                <div class="flex-1">
+                  <p class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide">Phone</p>
+                  <p class="text-gray-900 dark:text-white font-medium" data-th-text="${loggedInUser.phoneNumber}">123-456-7890</p>
+                </div>
+                <span data-th-if="${loggedInUser.phoneVerified}" class="px-3 py-1 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 text-xs font-semibold rounded-full">
+                  <i class="fa-solid fa-circle-check"></i> Verified
+                </span>
+                <span data-th-unless="${loggedInUser.phoneVerified}" class="px-3 py-1 bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200 text-xs font-semibold rounded-full">
+                  <i class="fa-solid fa-circle-xmark"></i> Not Verified
+                </span>
+              </div>
+
+              <!-- About -->
+              <div class="flex items-start gap-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                <div class="flex-shrink-0 w-10 h-10 bg-purple-100 dark:bg-purple-900 rounded-full flex items-center justify-center">
+                  <i class="fa-solid fa-user text-purple-600 dark:text-purple-400"></i>
+                </div>
+                <div class="flex-1">
+                  <p class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">About</p>
+                  <p class="text-gray-900 dark:text-white" data-th-text="${loggedInUser.about}">About the user...</p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </div>
     </div>
 
+    <!-- Edit Profile Modal -->
+    <div id="editModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+      <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+        <div class="p-6">
+          <div class="flex justify-between items-center mb-6">
+            <h3 class="text-2xl font-bold text-gray-900 dark:text-white">Edit Profile</h3>
+            <button onclick="closeEditModal()" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+              <i class="fa-solid fa-xmark text-2xl"></i>
+            </button>
+          </div>
+
+          <form action="/user/profile/update" method="post" enctype="multipart/form-data">
+            <!-- Profile Photo -->
+            <div class="mb-6">
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Profile Photo</label>
+              <div class="flex items-center gap-4">
+                <img id="previewImage" data-th-src="@{${loggedInUser.profilePic}}" src="/images/unknow_user.png" 
+                     class="w-20 h-20 rounded-full object-cover border-2 border-gray-300 dark:border-gray-600">
+                <input type="file" name="profileImage" accept="image/*" onchange="previewFile(this)"
+                       class="block w-full text-sm text-gray-900 dark:text-gray-300 border border-gray-300 dark:border-gray-600 rounded-lg cursor-pointer bg-gray-50 dark:bg-gray-700">
+              </div>
+            </div>
+
+            <!-- Name -->
+            <div class="mb-4">
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Name</label>
+              <input type="text" name="name" data-th-value="${loggedInUser.name}" required
+                     class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+            </div>
+
+            <!-- Phone -->
+            <div class="mb-4">
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Phone Number</label>
+              <div class="flex gap-2">
+                <input type="text" id="phoneInput" name="phoneNumber" data-th-value="${loggedInUser.phoneNumber}"
+                       class="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                <button type="button" onclick="sendOTP()" data-th-if="${!loggedInUser.phoneVerified}"
+                        class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg">Send OTP</button>
+              </div>
+            </div>
+
+            <!-- OTP Verification -->
+            <div id="otpSection" class="hidden mb-4">
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Enter OTP</label>
+              <div class="flex gap-2">
+                <input type="text" id="otpInput" placeholder="Enter 6-digit OTP"
+                       class="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                <button type="button" onclick="verifyOTP()"
+                        class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg">Verify</button>
+              </div>
+            </div>
+
+            <!-- About -->
+            <div class="mb-6">
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">About</label>
+              <textarea name="about" rows="4" data-th-text="${loggedInUser.about}"
+                        class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"></textarea>
+            </div>
+
+            <!-- Buttons -->
+            <div class="flex gap-3 justify-end">
+              <button type="button" onclick="closeEditModal()"
+                      class="px-6 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700">
+                Cancel
+              </button>
+              <button type="submit"
+                      class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg">
+                Save Changes
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
     <script>
+      let originalPhone = '[[${loggedInUser.phoneNumber}]]';
+
+      function openEditModal() {
+        document.getElementById('editModal').classList.remove('hidden');
+      }
+
+      function closeEditModal() {
+        document.getElementById('editModal').classList.add('hidden');
+      }
+
+      function previewFile(input) {
+        if (input.files && input.files[0]) {
+          const reader = new FileReader();
+          reader.onload = function(e) {
+            document.getElementById('previewImage').src = e.target.result;
+          }
+          reader.readAsDataURL(input.files[0]);
+        }
+      }
+
+      function sendOTP() {
+        const phone = document.getElementById('phoneInput').value;
+        if (!phone) {
+          Swal.fire('Error', 'Please enter phone number', 'error');
+          return;
+        }
+
+        fetch('/user/profile/send-otp', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+          body: 'phoneNumber=' + encodeURIComponent(phone)
+        })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            document.getElementById('otpSection').classList.remove('hidden');
+            Swal.fire('Success', data.message, 'success');
+          } else {
+            Swal.fire('Error', data.message, 'error');
+          }
+        });
+      }
+
+      function verifyOTP() {
+        const phone = document.getElementById('phoneInput').value;
+        const otp = document.getElementById('otpInput').value;
+
+        fetch('/user/profile/verify-otp', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+          body: 'phoneNumber=' + encodeURIComponent(phone) + '&otp=' + encodeURIComponent(otp)
+        })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            Swal.fire('Success', data.message, 'success').then(() => location.reload());
+          } else {
+            Swal.fire('Error', data.message, 'error');
+          }
+        });
+      }
+
       console.log("this is profile page");
     </script>
 </body>

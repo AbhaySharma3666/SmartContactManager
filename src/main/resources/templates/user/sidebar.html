@@ -14,7 +14,7 @@
       <img 
               crossorigin="anonymous"
               onerror="this.onerror=null; this.src='/images/unknow_user.png'"
-              data-th-src="@{${loggedInUser.profilePic}}" src="/images/unknow_user.png"
+              data-th-src="@{${loggedInUser.profilePic} + '?t=' + ${#dates.createNow().time}}" src="/images/unknow_user.png"
               alt="Profile Photo" class="w-44 h-44 rounded-full shadow-lg object-cover mb-4">
 
       <span class="text-gray-600 dark:text-gray-400" data-th-text="${loggedInUser.name}"
