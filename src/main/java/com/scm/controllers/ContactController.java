@@ -188,6 +188,14 @@ public class ContactController {
     public String deleteContact(
             @PathVariable("contactId") String contactId,
             HttpSession session) {
+        
+        // Get contact and delete image from Cloudinary
+        Contact contact = contactService.getById(contactId);
+        if (contact.getCloudinaryImagePublicId() != null && !contact.getCloudinaryImagePublicId().isEmpty()) {
+            imageService.deleteImage(contact.getCloudinaryImagePublicId());
+            logger.info("Deleted image from Cloudinary: {}", contact.getCloudinaryImagePublicId());
+        }
+        
         contactService.delete(contactId);
         logger.info("contactId {} deleted", contactId);
 
@@ -273,6 +281,13 @@ public class ContactController {
 
         if (contactForm.getContactImage() != null && !contactForm.getContactImage().isEmpty()) {
             logger.info("file is not empty");
+            
+            // Delete old image if exists
+            if (con.getCloudinaryImagePublicId() != null && !con.getCloudinaryImagePublicId().isEmpty()) {
+                imageService.deleteImage(con.getCloudinaryImagePublicId());
+                logger.info("Deleted old contact image: {}", con.getCloudinaryImagePublicId());
+            }
+            
             String fileName = UUID.randomUUID().toString();
             String imageUrl = imageService.uploadImage(contactForm.getContactImage(), fileName);
             con.setCloudinaryImagePublicId(fileName);
