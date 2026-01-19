@@ -22,9 +22,9 @@ public class EmailServiceImpl implements EmailService {
 
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(to);
+        message.setFrom(domainName);
         message.setSubject(subject);
         message.setText(body);
-        message.setFrom(domainName);
         eMailSender.send(message);
 
     }

@@ -110,4 +110,11 @@ public class ContactServiceImpl implements ContactService
         return contactRepo.findByUserAndPhoneNumberContaining(user, phoneNumberKeyword, pageable);
     }
 
+    @Override
+    public Page<Contact> getByUserAndFavorite(User user, boolean favorite, int page, int size, String sortBy, String direction) {
+        Sort sort = direction.equals("desc") ? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
+        var pageable = PageRequest.of(page, size, sort);
+        return contactRepo.findByUserAndFavorite(user, favorite, pageable);
+    }
+
 }

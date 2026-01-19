@@ -98,6 +98,13 @@ public class PageController {
             return "register";
         }
 
+        // check if user already exists
+        if (userService.isUserExistByEmail(userForm.getEmail())) {
+            Message message = Message.builder().content("Email already registered").type(MessageType.red).build();
+            session.setAttribute("message", message);
+            return "redirect:/register";
+        }
+
         // TODO::Validate userForm[Next Video]
 
         // save to database

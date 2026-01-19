@@ -23,4 +23,11 @@ public class ApiController {
         return contactService.getById(contactId);
     }
 
+    @GetMapping("/contacts/{contactId}/toggle-favorite")
+    public Contact toggleFavorite(@PathVariable String contactId) {
+        Contact contact = contactService.getById(contactId);
+        contact.setFavorite(!contact.isFavorite());
+        return contactService.update(contact);
+    }
+
 }

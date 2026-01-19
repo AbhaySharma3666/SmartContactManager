@@ -1,6 +1,7 @@
 console.log("Contacts.js");
-// const baseURL = "http://localhost:8081";
-const baseURL = "https://www.scm20.site";
+// const baseURL = "http://localhost:8080";
+const baseURL = window.location.origin;
+// const baseURL = "https://www.scm20.site";
 const viewContactModal = document.getElementById("view_contact_modal");
 
 // options with default values
@@ -24,7 +25,7 @@ const options = {
 
 // instance options object
 const instanceOptions = {
-  id: "view_contact_mdoal",
+  id: "view_contact_modal",
   override: true,
 };
 
@@ -39,29 +40,44 @@ function closeContactModal() {
 }
 
 async function loadContactdata(id) {
-  //function call to load data
   console.log(id);
   try {
     const data = await (await fetch(`${baseURL}/api/contacts/${id}`)).json();
     console.log(data);
+    
     document.querySelector("#contact_name").innerHTML = data.name;
     document.querySelector("#contact_email").innerHTML = data.email;
     document.querySelector("#contact_image").src = data.picture;
-    document.querySelector("#contact_address").innerHTML = data.address;
+    document.querySelector("#contact_address").innerHTML = data.address || 'Not provided';
     document.querySelector("#contact_phone").innerHTML = data.phoneNumber;
-    document.querySelector("#contact_about").innerHTML = data.description;
-    const contactFavorite = document.querySelector("#contact_favorite");
-    if (data.favorite) {
-      contactFavorite.innerHTML =
-        "<i class='fas fa-star text-yellow-400'></i><i class='fas fa-star text-yellow-400'></i><i class='fas fa-star text-yellow-400'></i><i class='fas fa-star text-yellow-400'></i><i class='fas fa-star text-yellow-400'></i>";
+    document.querySelector("#contact_about").innerHTML = data.description || 'No description available';
+    
+    // Handle website link
+    const websiteContainer = document.querySelector("#website_container");
+    const websiteLink = document.querySelector("#contact_website");
+    if (data.websiteLink && data.websiteLink.trim() !== '') {
+      websiteLink.href = data.websiteLink;
+      websiteLink.innerHTML = data.websiteLink;
+      websiteContainer.style.display = 'flex';
     } else {
-      contactFavorite.innerHTML = "Not Favorite Contact";
+      websiteContainer.style.display = 'none';
     }
-
-    document.querySelector("#contact_website").href = data.websiteLink;
-    document.querySelector("#contact_website").innerHTML = data.websiteLink;
-    document.querySelector("#contact_linkedIn").href = data.linkedInLink;
-    document.querySelector("#contact_linkedIn").innerHTML = data.linkedInLink;
+    
+    // Handle LinkedIn link
+    const linkedinContainer = document.querySelector("#linkedin_container");
+    const linkedinLink = document.querySelector("#contact_linkedIn");
+    if (data.linkedInLink && data.linkedInLink.trim() !== '') {
+      linkedinLink.href = data.linkedInLink;
+      linkedinLink.innerHTML = data.linkedInLink;
+      linkedinContainer.style.display = 'flex';
+    } else {
+      linkedinContainer.style.display = 'none';
+    }
+    
+    // Set action buttons
+    document.querySelector("#call_button").href = `tel:${data.phoneNumber}`;
+    document.querySelector("#email_button").href = `mailto:${data.email}`;
+    
     openContactModal();
   } catch (error) {
     console.log("Error: ", error);
@@ -83,4 +99,20 @@ async function deleteContact(id) {
       window.location.replace(url);
     }
   });
+}
+
+// toggle favorite
+async function toggleFavorite(id, event) {
+  event.stopPropagation();
+  const icon = event.currentTarget.querySelector('i');
+  try {
+    const data = await (await fetch(`${baseURL}/api/contacts/${id}/toggle-favorite`)).json();
+    if (data.favorite) {
+      icon.className = 'fa-solid fa-star text-yellow-500 dark:text-yellow-400';
+    } else {
+      icon.className = 'fa-regular fa-star text-gray-700 dark:text-gray-300';
+    }
+  } catch (error) {
+    console.log("Error: ", error);
+  }
 }

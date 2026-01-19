@@ -28,4 +28,6 @@ public interface ContactRepo extends JpaRepository<Contact, String> {
 
     Page<Contact> findByUserAndPhoneNumberContaining(User user, String phonekeyword, Pageable pageable);
 
+    Page<Contact> findByUserAndFavorite(User user, boolean favorite, Pageable pageable);
+
 }

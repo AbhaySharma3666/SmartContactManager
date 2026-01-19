@@ -202,6 +202,27 @@ public class ContactController {
         return "redirect:/user/contacts";
     }
 
+    // view favorite contacts
+    @RequestMapping("/favorites")
+    public String viewFavoriteContacts(
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = AppConstants.PAGE_SIZE + "") int size,
+            @RequestParam(value = "sortBy", defaultValue = "name") String sortBy,
+            @RequestParam(value = "direction", defaultValue = "asc") String direction,
+            Model model,
+            Authentication authentication) {
+
+        String username = Helper.getEmailOfLoggedInUser(authentication);
+        User user = userService.getUserByEmail(username);
+        Page<Contact> pageContact = contactService.getByUserAndFavorite(user, true, page, size, sortBy, direction);
+
+        model.addAttribute("pageContact", pageContact);
+        model.addAttribute("pageSize", AppConstants.PAGE_SIZE);
+        model.addAttribute("contactSearchForm", new ContactSearchForm());
+
+        return "user/favorites";
+    }
+
     // update contact form view
     @GetMapping("/view/{contactId}")
     public String updateContactFormView(
