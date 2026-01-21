@@ -64,3 +64,23 @@ function changePageTheme(theme, oldTheme) {
 }
 
 //change page change theme
+
+// SweetAlert2 theme configuration
+function getSwalTheme() {
+  const isDark = document.querySelector('html').classList.contains('dark');
+  return {
+    background: isDark ? '#1f2937' : '#ffffff',
+    color: isDark ? '#f3f4f6' : '#111827',
+    confirmButtonColor: '#3b82f6',
+    cancelButtonColor: '#6b7280'
+  };
+}
+
+window.Swal = window.Swal || {};
+const originalFire = window.Swal.fire;
+if (originalFire) {
+  window.Swal.fire = function(...args) {
+    const options = typeof args[0] === 'object' ? args[0] : {};
+    return originalFire.call(this, { ...getSwalTheme(), ...options });
+  };
+}

@@ -13,18 +13,28 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Event delegation for add and remove member buttons
 document.addEventListener('click', function(e) {
-  // Handle add member button
-  const addBtn = e.target.closest('.add-member-btn');
-  if (addBtn) {
-    const contactId = addBtn.dataset.contactId;
-    addMember(contactId);
+  // Handle member card click (for viewing contact details)
+  const memberCard = e.target.closest('.member-card');
+  if (memberCard && !e.target.closest('.remove-member-btn')) {
+    const contactId = memberCard.dataset.contactId;
+    loadContactdata(contactId);
+    return;
   }
   
   // Handle remove member button
   const removeBtn = e.target.closest('.remove-member-btn');
   if (removeBtn) {
+    e.stopPropagation();
     const contactId = removeBtn.dataset.contactId;
     removeMember(contactId);
+    return;
+  }
+  
+  // Handle add member button
+  const addBtn = e.target.closest('.add-member-btn');
+  if (addBtn) {
+    const contactId = addBtn.dataset.contactId;
+    addMember(contactId);
   }
 });
 
