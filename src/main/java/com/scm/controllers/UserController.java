@@ -8,25 +8,39 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.scm.entities.User;
 import com.scm.forms.FeedbackForm;
+import com.scm.forms.GroupForm;
 import com.scm.forms.UserUpdateForm;
 import com.scm.helpers.Helper;
 import com.scm.helpers.Message;
 import com.scm.helpers.MessageType;
+import com.scm.services.GroupService;
 import com.scm.services.ImageService;
 import com.scm.services.SmsService;
 import com.scm.services.UserService;
+import com.scm.services.GroupService;
+import com.scm.entities.Contact;
+import com.scm.entities.ContactGroup;
 import com.scm.entities.Feedback;
+import com.scm.entities.GroupMember;
+import com.scm.repositories.ContactRepo;
 import com.scm.repositories.FeedbackRepo;
+import com.scm.repositories.GroupRepo;
 
 import jakarta.servlet.http.HttpSession;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
@@ -49,6 +63,15 @@ public class UserController {
     @Autowired
     private FeedbackRepo feedbackRepo;
 
+    @Autowired
+    private GroupRepo groupRepo;
+
+    @Autowired
+    private GroupService groupService;
+    
+    @Autowired
+    private ContactRepo contactRepo;
+
     private Map<String, String> otpStore = new HashMap<>();
 
     // user dashbaord page
@@ -68,7 +91,8 @@ public class UserController {
 
     // update profile
     @PostMapping("/profile/update")
-    public String updateProfile(@ModelAttribute UserUpdateForm form, HttpSession session, Authentication authentication) {
+    public String updateProfile(@ModelAttribute UserUpdateForm form, HttpSession session,
+            Authentication authentication) {
         try {
             logger.info("Starting profile update");
             String username = Helper.getEmailOfLoggedInUser(authentication);
@@ -86,21 +110,23 @@ public class UserController {
 
             // Handle profile image
             if (form.getProfileImage() != null && !form.getProfileImage().isEmpty()) {
-                logger.info("Uploading image: {} (size: {} bytes)", 
-                    form.getProfileImage().getOriginalFilename(), 
-                    form.getProfileImage().getSize());
+                logger.info("Uploading image: {} (size: {} bytes)",
+                        form.getProfileImage().getOriginalFilename(),
+                        form.getProfileImage().getSize());
                 try {
                     // Delete old image if exists
                     String oldProfilePic = user.getProfilePic();
-                    if (oldProfilePic != null && !oldProfilePic.isEmpty() && !oldProfilePic.contains("unknow_user.png")) {
-                        String oldPublicId = oldProfilePic.substring(oldProfilePic.lastIndexOf("/") + 1, oldProfilePic.lastIndexOf("."));
+                    if (oldProfilePic != null && !oldProfilePic.isEmpty()
+                            && !oldProfilePic.contains("unknow_user.png")) {
+                        String oldPublicId = oldProfilePic.substring(oldProfilePic.lastIndexOf("/") + 1,
+                                oldProfilePic.lastIndexOf("."));
                         imageService.deleteImage(oldPublicId);
                         logger.info("Deleted old profile image: {}", oldPublicId);
                     }
-                    
+
                     // Create unique filename with timestamp
                     String uniqueFilename = "profile_" + user.getUserId() + "_" + System.currentTimeMillis();
-                    
+
                     String imageUrl = imageService.uploadImage(form.getProfileImage(), uniqueFilename);
                     logger.info("Uploaded image URL: {}", imageUrl);
                     user.setProfilePic(imageUrl);
@@ -116,7 +142,7 @@ public class UserController {
                 User updatedUser = updatedUserOpt.get();
                 logger.info("Profile updated successfully. New profile pic: {}", updatedUser.getProfilePic());
             }
-            
+
             session.setAttribute("message", Message.builder()
                     .content("Profile updated successfully")
                     .type(MessageType.green)
@@ -140,10 +166,10 @@ public class UserController {
             String otp = String.format("%06d", new Random().nextInt(999999));
             otpStore.put(phoneNumber, otp);
             logger.info("Generated OTP for {}: {}", phoneNumber, otp);
-            
+
             String message = "Your OTP for Smart Contact Manager is: " + otp + " Valid for 5 minutes.";
             boolean smsSent = smsService.sendSms(phoneNumber, message);
-            
+
             if (smsSent) {
                 logger.info("OTP sent successfully to {}", phoneNumber);
                 response.put("success", true);
@@ -165,7 +191,8 @@ public class UserController {
     // Verify OTP
     @PostMapping("/profile/verify-otp")
     @ResponseBody
-    public Map<String, Object> verifyOTP(@RequestParam String phoneNumber, @RequestParam String otp, Authentication authentication) {
+    public Map<String, Object> verifyOTP(@RequestParam String phoneNumber, @RequestParam String otp,
+            Authentication authentication) {
         Map<String, Object> response = new HashMap<>();
         try {
             String storedOtp = otpStore.get(phoneNumber);
@@ -205,7 +232,8 @@ public class UserController {
 
     // Submit feedback
     @PostMapping("/feedback")
-    public String submitFeedback(@ModelAttribute FeedbackForm form, HttpSession session, Authentication authentication) {
+    public String submitFeedback(@ModelAttribute FeedbackForm form, HttpSession session,
+            Authentication authentication) {
         try {
             String username = Helper.getEmailOfLoggedInUser(authentication);
             User user = userService.getUserByEmail(username);
@@ -232,6 +260,177 @@ public class UserController {
                     .build());
         }
         return "redirect:/user/feedback";
+    }
+
+    // Groups page
+    @GetMapping("/groups")
+    public String groupsPage(Model model, Authentication authentication) {
+        try {
+            String username = Helper.getEmailOfLoggedInUser(authentication);
+            User user = userService.getUserByEmail(username);
+            
+            if(user == null){
+                logger.error("User not found: {}", username);
+                model.addAttribute("groups", new ArrayList<>());
+                return "user/groups";
+            }
+            
+            List<ContactGroup> groups = groupRepo.findByUser(user);
+            logger.info("Found {} groups for user {}", groups.size(), username);
+            
+            List<Map<String, Object>> groupsWithCount = new ArrayList<>();
+            for(ContactGroup group : groups){
+                try {
+                    Map<String, Object> groupData = new HashMap<>();
+                    groupData.put("groupId", group.getGroupId());
+                    groupData.put("name", group.getName());
+                    groupData.put("description", group.getDescription() != null ? group.getDescription() : "");
+                    groupData.put("createdAt", group.getCreatedAt());
+                    groupData.put("memberCount", groupService.getMemberCount(group.getGroupId()));
+                    groupsWithCount.add(groupData);
+                } catch (Exception e) {
+                    logger.error("Error processing group: {}", group.getGroupId(), e);
+                }
+            }
+            
+            logger.info("Returning {} groups with data", groupsWithCount.size());
+            model.addAttribute("groups", groupsWithCount);
+            return "user/groups";
+        } catch (Exception e) {
+            logger.error("Error loading groups", e);
+            model.addAttribute("groups", new ArrayList<>());
+            return "user/groups";
+        }
+    }
+
+    // Create group
+    @PostMapping("/groups/create")
+    @ResponseBody
+    public Map<String, Object> createGroup(@RequestParam String name, @RequestParam(required = false) String description, Authentication authentication) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            String username = Helper.getEmailOfLoggedInUser(authentication);
+            User user = userService.getUserByEmail(username);
+
+            groupService.createGroup(name, description, user);
+            logger.info("Group created: {}", name);
+
+            response.put("success", true);
+            response.put("message", "Group created successfully");
+        } catch (Exception e) {
+            logger.error("Error creating group", e);
+            response.put("success", false);
+            response.put("message", "Failed to create group");
+        }
+        return response;
+    }
+
+    // Delete group
+    @PostMapping("/groups/delete/{groupId}")
+    @ResponseBody
+    public Map<String, Object> deleteGroup(@PathVariable String groupId) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            groupService.deleteGroup(groupId);
+            logger.info("Group deleted: {}", groupId);
+            response.put("success", true);
+            response.put("message", "Group deleted successfully");
+        } catch (Exception e) {
+            logger.error("Error deleting group", e);
+            response.put("success", false);
+            response.put("message", "Failed to delete group");
+        }
+        return response;
+    }
+
+    // Group details page
+    @GetMapping("/groups/details/{groupId}")
+    public String groupDetailsPage(@PathVariable String groupId, Model model, Authentication authentication) {
+        try {
+            String username = Helper.getEmailOfLoggedInUser(authentication);
+            User user = userService.getUserByEmail(username);
+            
+            ContactGroup group = groupService.getGroupById(groupId).orElseThrow();
+            
+            // Verify group belongs to user
+            if(!group.getUser().getUserId().equals(user.getUserId())){
+                return "redirect:/user/groups";
+            }
+            
+            List<GroupMember> members = groupService.getGroupMembers(groupId);
+            List<Contact> allContacts = contactRepo.findByUserId(user.getUserId());
+            
+            model.addAttribute("group", group);
+            model.addAttribute("members", members);
+            model.addAttribute("memberCount", members.size());
+            model.addAttribute("allContacts", allContacts);
+            
+            return "user/group_details";
+        } catch (Exception e) {
+            logger.error("Error loading group details", e);
+            return "redirect:/user/groups";
+        }
+    }
+    
+    // Update group
+    @PostMapping("/groups/update/{groupId}")
+    @ResponseBody
+    public Map<String, Object> updateGroup(@PathVariable String groupId, 
+                                          @RequestParam String name, 
+                                          @RequestParam(required = false) String description) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            ContactGroup group = groupService.getGroupById(groupId).orElseThrow();
+            group.setName(name);
+            group.setDescription(description);
+            groupService.updateGroup(group);
+            
+            response.put("success", true);
+            response.put("message", "Group updated successfully");
+        } catch (Exception e) {
+            logger.error("Error updating group", e);
+            response.put("success", false);
+            response.put("message", "Failed to update group");
+        }
+        return response;
+    }
+    
+    // Add member to group
+    @PostMapping("/groups/{groupId}/add-member")
+    @ResponseBody
+    public Map<String, Object> addMemberToGroup(@PathVariable String groupId, 
+                                                @RequestParam String contactId) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            groupService.addMember(groupId, contactId);
+            response.put("success", true);
+            response.put("message", "Member added successfully");
+            response.put("memberCount", groupService.getMemberCount(groupId));
+        } catch (Exception e) {
+            logger.error("Error adding member", e);
+            response.put("success", false);
+            response.put("message", "Failed to add member");
+        }
+        return response;
+    }
+    
+    // Remove member from group
+    @PostMapping("/groups/{groupId}/remove-member")
+    @ResponseBody
+    public Map<String, Object> removeMemberFromGroup(@PathVariable String groupId, 
+                                                     @RequestParam String contactId) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            groupService.removeMember(groupId, contactId);
+            response.put("success", true);
+            response.put("message", "Member removed successfully");
+            response.put("memberCount", groupService.getMemberCount(groupId));
+        } catch (Exception e) {
+            logger.error("Error removing member", e);
+            response.put("success", false);
+            response.put("message", "Failed to remove member");
+        }
+        return response;
     }
 
 }

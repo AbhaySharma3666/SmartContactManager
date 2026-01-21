@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en" th:replace="~{base :: parent(~{::#content},~{::title},~{::script})}">
+
+<head>
+  <title>Group Details | SCM</title>
+</head>
+
+<body>
+  <div id="content">
+    <div th:if="${loggedInUser}">
+      <div data-th-replace="~{user/sidebar :: sidebar}"></div>
+    </div>
+
+    <div class="sm:pl-64 pt-20">
+      <div class="p-4 md:p-8">
+        <!-- Header -->
+        <div class="flex justify-between items-center mb-6">
+          <div class="flex items-center gap-4">
+            <button onclick="window.location.href='/user/groups'" class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">
+              <i class="fa-solid fa-arrow-left text-2xl"></i>
+            </button>
+            <div>
+              <h2 class="text-3xl font-bold text-gray-900 dark:text-white" th:text="${group.name}"></h2>
+              <p class="text-gray-600 dark:text-gray-400 mt-1" th:text="${group.description}"></p>
+            </div>
+          </div>
+          <div class="flex gap-2">
+            <button onclick="openEditModal()" class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium">
+              <i class="fa-solid fa-edit"></i> Edit
+            </button>
+            <button onclick="openAddMemberModal()" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium">
+              <i class="fa-solid fa-user-plus"></i> Add Member
+            </button>
+          </div>
+        </div>
+
+        <!-- Stats -->
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 mb-6">
+          <div class="flex items-center gap-4">
+            <div class="flex items-center gap-2">
+              <i class="fa-solid fa-users text-blue-600 text-2xl"></i>
+              <div>
+                <p class="text-sm text-gray-500 dark:text-gray-400">Total Members</p>
+                <p id="memberCount" class="text-2xl font-bold text-gray-900 dark:text-white" th:text="${memberCount}"></p>
+              </div>
+            </div>
+            <div class="ml-auto text-sm text-gray-500 dark:text-gray-400">
+              <span th:text="'Created: ' + ${#temporals.format(group.createdAt, 'MMM dd, yyyy')}"></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Search Bar -->
+        <div class="mb-6">
+          <div class="relative">
+            <input type="text" id="searchInput" placeholder="Search members..." 
+                   class="w-full px-8 py-3 pl-15 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+            <i class="fa-solid fa-search absolute left-3 top-4 text-gray-400"></i>
+          </div>
+        </div>
+
+        <!-- Members List -->
+        <div id="membersContainer" class="grid grid-cols-1 gap-4">
+          <div th:if="${members.isEmpty()}" class="text-center py-12 text-gray-500 dark:text-gray-400">No members found</div>
+          <div th:each="member : ${members}"
+               class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-4 flex items-center gap-4 member-card">
+            <img th:src="${member.contact.picture}" th:alt="${member.contact.name}" class="w-16 h-16 rounded-full" onerror="this.onerror=null; this.src='/images/unknow_user.png'">
+            <div class="flex-1">
+              <h3 class="text-lg font-bold text-gray-900 dark:text-white" th:text="${member.contact.name}"></h3>
+              <p class="text-sm text-gray-500 dark:text-gray-400" th:text="${member.contact.email}"></p>
+              <p class="text-sm text-gray-500 dark:text-gray-400" th:text="${member.contact.phoneNumber}"></p>
+            </div>
+            <button class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg remove-member-btn"
+                    th:data-contact-id="${member.contact.id}">
+              <i class="fa-solid fa-user-minus"></i> Remove
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Edit Group Modal -->
+    <div id="editModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+      <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl max-w-md w-full p-6">
+        <div class="flex justify-between items-center mb-6">
+          <h3 class="text-2xl font-bold text-gray-900 dark:text-white">Edit Group</h3>
+          <button onclick="closeEditModal()" class="text-gray-500 hover:text-gray-700 dark:text-gray-400">
+            <i class="fa-solid fa-xmark text-2xl"></i>
+          </button>
+        </div>
+        <form id="editForm">
+          <input type="hidden" id="groupId" th:value="${group.groupId}">
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Group Name</label>
+            <input type="text" id="editGroupName" required th:value="${group.name}"
+                   class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+          </div>
+          <div class="mb-6">
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Description</label>
+            <textarea id="editGroupDescription" rows="3" th:text="${group.description}"
+                      class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"></textarea>
+          </div>
+          <div class="flex gap-3">
+            <button type="button" onclick="closeEditModal()"
+                    class="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700">
+              Cancel
+            </button>
+            <button type="submit"
+                    class="flex-1 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium">
+              Save Changes
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Add Member Modal -->
+    <div id="addMemberModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+      <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl max-w-2xl w-full p-6">
+        <div class="flex justify-between items-center mb-6">
+          <h3 class="text-2xl font-bold text-gray-900 dark:text-white">Add Members</h3>
+          <button onclick="closeAddMemberModal()" class="text-gray-500 hover:text-gray-700 dark:text-gray-400">
+            <i class="fa-solid fa-xmark text-2xl"></i>
+          </button>
+        </div>
+        
+        <!-- Search Contacts -->
+        <div class="mb-4">
+          <input type="text" id="contactSearch" placeholder="Search contacts..." 
+                 class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+        </div>
+
+        <!-- Available Contacts -->
+        <div id="availableContacts" class="max-h-96 overflow-y-auto space-y-2">
+          <div th:each="contact : ${allContacts}"
+               th:unless="${members.![contact.id].contains(contact.id)}"
+               class="bg-gray-50 dark:bg-gray-700 rounded-lg p-3 flex items-center gap-3 contact-item"
+               th:data-name="${contact.name}"
+               th:data-email="${contact.email}"
+               th:data-id="${contact.id}">
+            <img th:src="${contact.picture}" th:alt="${contact.name}" class="w-12 h-12 rounded-full" onerror="this.onerror=null; this.src='/images/unknow_user.png'">
+            <div class="flex-1">
+              <h4 class="font-semibold text-gray-900 dark:text-white" th:text="${contact.name}"></h4>
+              <p class="text-sm text-gray-500 dark:text-gray-400" th:text="${contact.email}"></p>
+            </div>
+            <button type="button" class="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm add-member-btn"
+                    th:data-contact-id="${contact.id}">
+              Add
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div th:fragment="script">
+    <script th:src="@{/js/group_details.js}"></script>
+    <script>
+      groupId = /*[[${group.groupId}]]*/ '';
+      existingMemberIds = /*[[${members.![contact.id]}]]*/ [];
+    </script>
+  </div>
+</body>
+</html>

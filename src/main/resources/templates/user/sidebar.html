@@ -1,35 +1,36 @@
 <aside
   data-th-fragment="sidebar"
   id="logo-sidebar"
-  class="fixed top-0 left-0 z-40 w-64 h-screen transition-transform -translate-x-full sm:translate-x-0"
+  class="fixed top-0 left-0 z-50 w-64 h-screen transition-transform -translate-x-full sm:translate-x-0"
   aria-label="Sidebar"
 >
   <div
-    class="h-full pt-16 px-3 py-4 overflow-y-auto bg-gray-50 dark:bg-gray-800 scrollbar-hide"
+    class="h-full pt-0 px-0 py-0 overflow-y-auto bg-gray-50 dark:bg-gray-800 scrollbar-hide"
   >
     <a
-      href="https://flowbite.com/"
-      class="flex flex-col items-center ps-2.5 mb-8"
+      data-th-href="@{'/user/dashboard'}"
+      class="flex flex-col items-center ps-2.5 pt-5 pb-5 mb-4 bg-gray-50 dark:bg-gray-900 shadow-md"
     >
       <img 
-              crossorigin="anonymous"
-              onerror="this.onerror=null; this.src='/images/unknow_user.png'"
-              data-th-src="@{${loggedInUser.profilePic} + '?t=' + ${#dates.createNow().time}}" src="/images/unknow_user.png"
-              alt="Profile Photo" class="w-44 h-44 rounded-full shadow-lg object-cover mb-4">
+              onerror="this.src='/images/unknow_user.png'"
+              data-th-src="@{${loggedInUser.profilePic != null ? loggedInUser.profilePic : '/images/unknow_user.png'}}" 
+              src="/images/unknow_user.png"
+              alt="Profile Photo" 
+              class="w-44 h-44 rounded-full shadow-lg shadow-cyan-500/50 object-cover mb-3">
 
       <span class="text-gray-600 dark:text-gray-400" data-th-text="${loggedInUser.name}"
-        >Durgesh Kumar Tiwari</span
+        >Abhay</span
       >
       <span
         class="self-center text-xl font-semibold whitespace-nowrap dark:text-white"
         >Welcome to SCM</span
       >
     </a>
-    <ul class="space-y-2 font-medium overflow-y-auto scrollbar-hide">
+    <ul class="space-y-2 font-medium overflow-y-auto scrollbar-hide pl-3">
       <li>
         <a
           data-th-href="@{'/user/dashboard'}"
-          class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
+          class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-300 dark:hover:bg-gray-700 group"
         >
           <svg
             class="w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
@@ -52,7 +53,7 @@
       <li>
         <a
           data-th-href="@{'/user/contacts/add'}"
-          class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
+          class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-300 dark:hover:bg-gray-700 group"
         >
           <i class="fa-solid fa-plus h-5 w-5"></i>
           <span class="flex-1 ms-3 whitespace-nowrap">Add Contact</span>
@@ -66,7 +67,7 @@
       <li>
         <a
           data-th-href="@{'/user/contacts'}"
-          class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
+          class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-300 dark:hover:bg-gray-700 group"
         >
           <i class="fa-regular fa-address-book h-5 w-5"></i>
           <span class="flex-1 ms-3 whitespace-nowrap">View Contacts</span>
@@ -75,8 +76,8 @@
 
       <li>
         <a
-          href="#"
-          class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
+          data-th-href="@{'/user/groups'}"
+          class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-300 dark:hover:bg-gray-700 group"
         >
           <svg
             class="flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
@@ -96,7 +97,7 @@
       <li>
         <a
           data-th-href="@{'/user/contacts/favorites'}"
-          class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
+          class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-300 dark:hover:bg-gray-700 group"
         >
           <svg
             class="flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
@@ -116,7 +117,7 @@
       <li>
         <a
           data-th-href="@{'/user/profile'}"
-          class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
+          class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-300 dark:hover:bg-gray-700 group"
         >
           <svg
             class="flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
@@ -141,7 +142,7 @@
       <li>
         <a
           data-th-href="@{'/user/feedback'}"
-          class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
+          class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-300 dark:hover:bg-gray-700 group"
         >
           <svg
             class="flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"
@@ -167,7 +168,7 @@
       <li>
         <a
           data-th-if="${loggedInUser != null}" data-th-href="@{'/do-logout'}"
-          class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
+          class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-300 dark:hover:bg-gray-700 group"
         >
           <svg
             class="flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"

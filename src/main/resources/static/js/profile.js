@@ -1,5 +1,8 @@
 // Profile page JavaScript
 
+if (typeof window.profilePageLoaded === 'undefined') {
+  window.profilePageLoaded = true;
+
 let originalPhone = '';
 
 function openEditModal() {
@@ -143,3 +146,5 @@ function verifyOTP() {
 }
 
 console.log("Profile page loaded");
+
+}

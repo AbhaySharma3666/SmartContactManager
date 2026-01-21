@@ -35,8 +35,8 @@ public class PageController {
         System.out.println("Home page handler");
         // sending data to view
         model.addAttribute("name", "Substring Technologies");
-        model.addAttribute("youtubeChannel", "Learn Code With Durgesh");
-        model.addAttribute("githubRepo", "https://github.com/learncodewithdurgesh/");
+        model.addAttribute("youtubeChannel", "Learn Code With Abhay");
+        model.addAttribute("githubRepo", "https://github.com/abhaysharma3666/");
         return "home";
     }
 
@@ -75,9 +75,6 @@ public class PageController {
     public String register(Model model) {
 
         UserForm userForm = new UserForm();
-        // default data bhi daal sakte hai
-        // userForm.setName("Durgesh");
-        // userForm.setAbout("This is about : Write something about yourself");
         model.addAttribute("userForm", userForm);
 
         return "register";
@@ -105,23 +102,6 @@ public class PageController {
             return "redirect:/register";
         }
 
-        // TODO::Validate userForm[Next Video]
-
-        // save to database
-
-        // userservice
-
-        // UserForm--> User
-        // User user = User.builder()
-        // .name(userForm.getName())
-        // .email(userForm.getEmail())
-        // .password(userForm.getPassword())
-        // .about(userForm.getAbout())
-        // .phoneNumber(userForm.getPhoneNumber())
-        // .profilePic(
-        // "https://www.learncodewithdurgesh.com/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Fdurgesh_sir.35c6cb78.webp&w=1920&q=75")
-        // .build();
-
         User user = new User();
         user.setName(userForm.getName());
         user.setEmail(userForm.getEmail());
@@ -130,7 +110,7 @@ public class PageController {
         user.setPhoneNumber(userForm.getPhoneNumber());
         user.setEnabled(false);
         user.setProfilePic(
-                "https://www.learncodewithdurgesh.com/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Fdurgesh_sir.35c6cb78.webp&w=1920&q=75");
+                "https://cdn-icons-png.flaticon.com/512/3135/3135715.png");
 
         User savedUser = userService.saveUser(user);
 
@@ -140,12 +120,12 @@ public class PageController {
 
         // add the message:
 
-        Message message = Message.builder().content("Registration Successful").type(MessageType.green).build();
+        Message message = Message.builder().content("Registration Successful! Verification email sent to " + userForm.getEmail()).type(MessageType.green).build();
 
         session.setAttribute("message", message);
 
         // redirectto login page
-        return "redirect:/register";
+        return "redirect:/login";
     }
 
 }
