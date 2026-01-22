@@ -70,9 +70,7 @@ function getSwalTheme() {
   const isDark = document.querySelector('html').classList.contains('dark');
   return {
     background: isDark ? '#1f2937' : '#ffffff',
-    color: isDark ? '#f3f4f6' : '#111827',
-    confirmButtonColor: '#3b82f6',
-    cancelButtonColor: '#6b7280'
+    color: isDark ? '#f3f4f6' : '#111827'
   };
 }
 

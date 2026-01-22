@@ -21,10 +21,8 @@
           <div class="col-span-3"></div>
           <div class="col-span-12 md:col-span-6">
             <div
-              class="card block p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700"
+              class="card block p-6 bg-white border border-gray-200 rounded-lg shadow  dark:bg-gray-800 dark:border-gray-700 "
             >
-              <div data-th-replace="message::messagebox"></div>
-
               <h1 class="text-2xl font-semibold">Update Contact</h1>
 
               <form
@@ -235,11 +233,11 @@
                   <input
                     data-th-field="*{favorite}"
                     type="checkbox"
-                    class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                    class="w-6 h-6 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
                   />
                   <label
                     for="default-checkbox"
-                    class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+                    class="ms-2 text-md font-medium text-gray-900 dark:text-gray-300"
                     >Is this contact is your favorite one ?</label
                   >
                 </div>
@@ -247,13 +245,13 @@
                 <div class="button-container text-center">
                   <button
                     type="submit"
-                    class="px-3 py-2 dark:bg-blue-600 hover:dark:bg-blue-700 rounded bg-black text-white"
+                    class="px-3 py-2 bg-blue-600 hover:bg-blue-800 rounded bg-black text-white"
                   >
                     Update Contact
                   </button>
                   <button
                     type="reset"
-                    class="px-3 py-2 dark:bg-blue-600 hover:dark:bg-blue-700 rounded bg-black text-white"
+                    class="px-3 py-2 bg-gray-600 hover:bg-gray-700 rounded bg-black text-white"
                   >
                     Reset
                   </button>
@@ -266,8 +264,6 @@
     </div>
 
     <script data-th-src="@{'/js/admin.js'}"></script>
-    <script>
-      console.log("this is profile page");
-    </script>
+    <script data-th-src="@{'/js/update_contact.js'}"></script>
   </body>
 </html>

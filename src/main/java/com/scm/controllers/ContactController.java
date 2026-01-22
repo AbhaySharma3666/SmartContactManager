@@ -189,23 +189,37 @@ public class ContactController {
             @PathVariable("contactId") String contactId,
             HttpSession session) {
         
-        // Get contact and delete image from Cloudinary
-        Contact contact = contactService.getById(contactId);
-        if (contact.getCloudinaryImagePublicId() != null && !contact.getCloudinaryImagePublicId().isEmpty()) {
-            imageService.deleteImage(contact.getCloudinaryImagePublicId());
-            logger.info("Deleted image from Cloudinary: {}", contact.getCloudinaryImagePublicId());
+        try {
+            // Get contact and delete image from Cloudinary
+            Contact contact = contactService.getById(contactId);
+            if (contact.getCloudinaryImagePublicId() != null && !contact.getCloudinaryImagePublicId().isEmpty()) {
+                try {
+                    imageService.deleteImage(contact.getCloudinaryImagePublicId());
+                    logger.info("Deleted image from Cloudinary: {}", contact.getCloudinaryImagePublicId());
+                } catch (Exception e) {
+                    logger.error("Failed to delete image from Cloudinary: {}", e.getMessage());
+                }
+            }
+            
+            contactService.delete(contactId);
+            logger.info("contactId {} deleted", contactId);
+
+            session.setAttribute("message",
+                    Message.builder()
+                            .content("Contact is Deleted successfully !! ")
+                            .type(MessageType.green)
+                            .build()
+
+            );
+        } catch (Exception e) {
+            logger.error("Error deleting contact: {}", e.getMessage());
+            session.setAttribute("message",
+                    Message.builder()
+                            .content("Failed to delete contact: " + e.getMessage())
+                            .type(MessageType.red)
+                            .build()
+            );
         }
-        
-        contactService.delete(contactId);
-        logger.info("contactId {} deleted", contactId);
-
-        session.setAttribute("message",
-                Message.builder()
-                        .content("Contact is Deleted successfully !! ")
-                        .type(MessageType.green)
-                        .build()
-
-        );
 
         return "redirect:/user/contacts";
     }

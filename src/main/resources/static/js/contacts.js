@@ -107,18 +107,66 @@ async function loadContactdata(id) {
 
 // delete contact
 
-async function deleteContact(id) {
+async function deleteContact(id, event) {
+  const deleteButton = event ? event.target.closest('button') : null;
+  const row = deleteButton ? deleteButton.closest('tr') : null;
+  
   Swal.fire({
     title: "Do you want to delete the contact?",
     icon: "warning",
     showCancelButton: true,
     confirmButtonText: "Delete",
-    theme: 'auto'
-  }).then((result) => {
-    /* Read more about isConfirmed, isDenied below */
+    cancelButtonText: "Cancel"
+  }).then(async (result) => {
     if (result.isConfirmed) {
-      const url = `${baseURL}/user/contacts/delete/` + id;
-      window.location.replace(url);
+      try {
+        const response = await fetch(`${baseURL}/api/contacts/${id}/delete`, {
+          method: 'GET'
+        });
+        
+        if (response.ok) {
+          Swal.fire({
+            icon: 'success',
+            title: 'Success!',
+            text: 'Contact Deleted Successfully!',
+            position: 'top-end',
+            toast: true,
+            timer: 2000,
+            showConfirmButton: false,
+            timerProgressBar: true
+          });
+          
+          // Remove contact row from table
+          if (row) {
+            setTimeout(() => {
+              row.remove();
+            }, 2000);
+          }
+        } else {
+          Swal.fire({
+            icon: 'error',
+            title: 'Error!',
+            text: 'Failed to delete contact',
+            position: 'top-end',
+            toast: true,
+            timer: 2000,
+            showConfirmButton: false,
+            timerProgressBar: true
+          });
+        }
+      } catch (error) {
+        console.log('Error:', error);
+        Swal.fire({
+          icon: 'error',
+          title: 'Error!',
+          text: 'Failed to delete contact',
+          position: 'top-end',
+          toast: true,
+          timer: 2000,
+          showConfirmButton: false,
+          timerProgressBar: true
+        });
+      }
     }
   });
 }

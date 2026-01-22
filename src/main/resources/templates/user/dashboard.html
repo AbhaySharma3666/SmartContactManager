@@ -22,52 +22,52 @@
           <!-- Statistics Cards -->
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             <!-- Total Contacts -->
-            <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl shadow-lg p-6 text-white">
+            <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl p-6 text-white shadow-lg shadow-blue-500/50">
               <div class="flex items-center justify-between">
                 <div>
-                  <p class="text-blue-100 text-sm font-medium mb-1">Total Contacts</p>
-                  <h3 class="text-3xl font-bold" th:text="${totalContacts}">0</h3>
+                  <p class="text-blue-600 dark:text-white text-md font-medium mb-1">Total Contacts</p>
+                  <h3 class="text-3xl text-blue-700 dark:text-white font-bold" th:text="${totalContacts}">0</h3>
                 </div>
-                <div class="bg-gray-600 dark:bg-gray-900 bg-opacity-20 rounded-full p-3">
+                <div class="bg-blue-50 dark:bg-gray-900 bg-opacity-20 rounded-full p-3">
                   <i class="fas fa-address-book text-5xl text-blue-700"></i>
                 </div>
               </div>
             </div>
 
             <!-- Favorite Contacts -->
-            <div class="bg-gradient-to-br from-pink-500 to-pink-600 rounded-xl shadow-lg p-6 text-white">
+            <div class="bg-gradient-to-br from-pink-500 to-pink-600 rounded-xl p-6 text-white shadow-lg shadow-blue-500/50">
               <div class="flex items-center justify-between">
                 <div>
-                  <p class="text-pink-100 text-sm font-medium mb-1">Favorites</p>
-                  <h3 class="text-3xl font-bold" th:text="${favoriteContacts}">0</h3>
+                  <p class="text-yellow-500 dark:text-white text-md font-medium mb-1">Favorites</p>
+                  <h3 class="text-3xl text-yellow-400 dark:text-white font-bold" th:text="${favoriteContacts}">0</h3>
                 </div>
-                <div class="bg-gray-600 dark:bg-gray-900 bg-opacity-20 rounded-full p-3">
+                <div class="bg-blue-50 dark:bg-gray-900 bg-opacity-20 rounded-full p-3">
                   <i class="fa-solid fa-bookmark text-5xl text-yellow-400"></i>
                 </div>
               </div>
             </div>
 
             <!-- Total Groups -->
-            <div class="bg-gradient-to-br from-green-500 to-green-600 rounded-xl shadow-lg p-6 text-white">
+            <div class="bg-gradient-to-br from-green-500 to-green-600 rounded-xl p-6 text-white shadow-lg shadow-blue-500/50">
               <div class="flex items-center justify-between">
                 <div>
-                  <p class="text-green-100 text-sm font-medium mb-1">Groups</p>
-                  <h3 class="text-3xl font-bold" th:text="${totalGroups}">0</h3>
+                  <p class="text-pink-500 dark:text-white text-sm font-medium mb-1">Groups</p>
+                  <h3 class="text-3xl  text-pink-600 dark:text-white font-bold" th:text="${totalGroups}">0</h3>
                 </div>
-                <div class="bg-gray-600 dark:bg-gray-900 bg-opacity-20 rounded-full p-3">
+                <div class="bg-blue-50 dark:bg-gray-900 bg-opacity-20 rounded-full p-3">
                   <i class="fa-solid fa-user-group text-5xl text-fuchsia-600"></i>
                 </div>
               </div>
             </div>
 
             <!-- Account Status -->
-            <div class="bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl shadow-lg p-6 text-white">
+            <div class="bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl p-6 text-white shadow-lg shadow-blue-500/50">
               <div class="flex items-center justify-between">
                 <div>
-                  <p class="text-purple-100 text-sm font-medium mb-1">Account</p>
-                  <h3 class="text-lg font-bold">Active</h3>
+                  <p class="text-green-500 dark:text-white text-sm font-medium mb-1">Account</p>
+                  <h3 class="text-lg text-green-500 dark:text-white font-bold">Active</h3>
                 </div>
-                <div class="bg-gray-600 dark:bg-gray-900 bg-opacity-20 rounded-full p-3">
+                <div class="bg-blue-50 dark:bg-gray-900 bg-opacity-20 rounded-full p-3">
                   <i class="fa-solid fa-user-check text-5xl text-green-500"></i>
                 </div>
               </div>
@@ -84,17 +84,17 @@
                 <span class="text-sm font-medium text-gray-900 dark:text-white">Add Contact</span>
               </button>
               <button onclick="window.location.href='/user/contacts'" 
-                      class="flex flex-col items-center gap-2 p-4 bg-green-50 dark:bg-gray-700 hover:bg-green-100 dark:hover:bg-gray-600 rounded-lg transition">
+                      class="flex flex-col items-center gap-2 p-4 bg-blue-50 dark:bg-gray-700 hover:bg-blue-100 dark:hover:bg-gray-600 rounded-lg transition">
                 <i class="fas fa-address-book text-2xl text-green-600 dark:text-green-400"></i>
                 <span class="text-sm font-medium text-gray-900 dark:text-white">View Contacts</span>
               </button>
               <button onclick="window.location.href='/user/groups'" 
-                      class="flex flex-col items-center gap-2 p-4 bg-purple-50 dark:bg-gray-700 hover:bg-purple-100 dark:hover:bg-gray-600 rounded-lg transition">
+                      class="flex flex-col items-center gap-2 p-4 bg-blue-50 dark:bg-gray-700 hover:bg-blue-100 dark:hover:bg-gray-600 rounded-lg transition">
                 <i class="fas fa-users text-2xl text-purple-600 dark:text-purple-400"></i>
                 <span class="text-sm font-medium text-gray-900 dark:text-white">Manage Groups</span>
               </button>
               <button onclick="window.location.href='/user/profile'" 
-                      class="flex flex-col items-center gap-2 p-4 bg-orange-50 dark:bg-gray-700 hover:bg-orange-100 dark:hover:bg-gray-600 rounded-lg transition">
+                      class="flex flex-col items-center gap-2 p-4 bg-blue-50 dark:bg-gray-700 hover:bg-blue-100 dark:hover:bg-gray-600 rounded-lg transition">
                 <i class="fas fa-user-cog text-2xl text-orange-600 dark:text-orange-400"></i>
                 <span class="text-sm font-medium text-gray-900 dark:text-white">Profile Settings</span>
               </button>
