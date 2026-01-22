@@ -26,11 +26,12 @@ import com.scm.services.GroupService;
 import com.scm.services.ImageService;
 import com.scm.services.SmsService;
 import com.scm.services.UserService;
-import com.scm.services.GroupService;
+import com.scm.services.DashboardService;
 import com.scm.entities.Contact;
 import com.scm.entities.ContactGroup;
 import com.scm.entities.Feedback;
 import com.scm.entities.GroupMember;
+import com.scm.entities.DashboardStats;
 import com.scm.repositories.ContactRepo;
 import com.scm.repositories.FeedbackRepo;
 import com.scm.repositories.GroupRepo;
@@ -72,13 +73,33 @@ public class UserController {
     @Autowired
     private ContactRepo contactRepo;
 
+    @Autowired
+    private DashboardService dashboardService;
+
     private Map<String, String> otpStore = new HashMap<>();
 
     // user dashbaord page
 
     @RequestMapping(value = "/dashboard")
-    public String userDashboard() {
-        System.out.println("User dashboard");
+    public String userDashboard(Model model, Authentication authentication) {
+        try {
+            String username = Helper.getEmailOfLoggedInUser(authentication);
+            User user = userService.getUserByEmail(username);
+            
+            DashboardStats stats = dashboardService.getDashboardStats(user);
+            
+            model.addAttribute("totalContacts", stats.getTotalContacts());
+            model.addAttribute("favoriteContacts", stats.getFavoriteContacts());
+            model.addAttribute("totalGroups", stats.getTotalGroups());
+            model.addAttribute("recentContacts", stats.getRecentContacts());
+            
+        } catch (Exception e) {
+            logger.error("Error loading dashboard", e);
+            model.addAttribute("totalContacts", 0L);
+            model.addAttribute("favoriteContacts", 0L);
+            model.addAttribute("totalGroups", 0L);
+            model.addAttribute("recentContacts", new ArrayList<>());
+        }
         return "user/dashboard";
     }
 

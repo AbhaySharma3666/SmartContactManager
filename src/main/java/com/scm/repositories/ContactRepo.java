@@ -30,4 +30,8 @@ public interface ContactRepo extends JpaRepository<Contact, String> {
 
     Page<Contact> findByUserAndFavorite(User user, boolean favorite, Pageable pageable);
 
+    // Dashboard optimized queries
+    long countByUser(User user);
+    long countByUserAndFavorite(User user, boolean favorite);
+    List<Contact> findTop5ByUserOrderByIdDesc(User user);
 }

@@ -1,36 +1,136 @@
 <!DOCTYPE html>
-<html
-  lang="en"
-  th:replace="~{base :: parent(~{::#content},~{::title},~{::script})}"
->
+<html lang="en" th:replace="~{base :: parent(~{::#content},~{::title},~{::script})}">
   <head>
-    <title data-th-text="${loggedInUser.name}+' |  Dashboard'">
-      Profile Page
-    </title>
+    <title data-th-text="${loggedInUser.name}+' | Dashboard'">Dashboard</title>
   </head>
   <body>
     <div id="content">
-      <!-- sidebar -->
-
-      <!-- user is logged in : sidebar -->
-
       <div th:if="${loggedInUser}">
         <div data-th-replace="~{user/sidebar :: sidebar}"></div>
       </div>
 
-      <div class="sm:pl-64 pt-20" style="height: 1000px">
-        <div class="flex justify-center flex-col items-center">
-          <h1 class="text-5xl">Welcome to Dashbaord page</h1>
-          <p>
-            Lorem ipsum dolor sit amet consectetur adipisicing elit.
-            Consequatur, ratione!
-          </p>
+      <div class="sm:pl-64 pt-20">
+        <div class="p-4 md:p-8">
+          <!-- Welcome Section -->
+          <div class="mb-8">
+            <h1 class="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-2">
+              Welcome back, <span th:text="${loggedInUser.name}"></span>!
+            </h1>
+            <p class="text-gray-600 dark:text-gray-400">Here's what's happening with your contacts today.</p>
+          </div>
+
+          <!-- Statistics Cards -->
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <!-- Total Contacts -->
+            <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl shadow-lg p-6 text-white">
+              <div class="flex items-center justify-between">
+                <div>
+                  <p class="text-blue-100 text-sm font-medium mb-1">Total Contacts</p>
+                  <h3 class="text-3xl font-bold" th:text="${totalContacts}">0</h3>
+                </div>
+                <div class="bg-gray-600 dark:bg-gray-900 bg-opacity-20 rounded-full p-3">
+                  <i class="fas fa-address-book text-5xl text-blue-700"></i>
+                </div>
+              </div>
+            </div>
+
+            <!-- Favorite Contacts -->
+            <div class="bg-gradient-to-br from-pink-500 to-pink-600 rounded-xl shadow-lg p-6 text-white">
+              <div class="flex items-center justify-between">
+                <div>
+                  <p class="text-pink-100 text-sm font-medium mb-1">Favorites</p>
+                  <h3 class="text-3xl font-bold" th:text="${favoriteContacts}">0</h3>
+                </div>
+                <div class="bg-gray-600 dark:bg-gray-900 bg-opacity-20 rounded-full p-3">
+                  <i class="fa-solid fa-bookmark text-5xl text-yellow-400"></i>
+                </div>
+              </div>
+            </div>
+
+            <!-- Total Groups -->
+            <div class="bg-gradient-to-br from-green-500 to-green-600 rounded-xl shadow-lg p-6 text-white">
+              <div class="flex items-center justify-between">
+                <div>
+                  <p class="text-green-100 text-sm font-medium mb-1">Groups</p>
+                  <h3 class="text-3xl font-bold" th:text="${totalGroups}">0</h3>
+                </div>
+                <div class="bg-gray-600 dark:bg-gray-900 bg-opacity-20 rounded-full p-3">
+                  <i class="fa-solid fa-user-group text-5xl text-fuchsia-600"></i>
+                </div>
+              </div>
+            </div>
+
+            <!-- Account Status -->
+            <div class="bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl shadow-lg p-6 text-white">
+              <div class="flex items-center justify-between">
+                <div>
+                  <p class="text-purple-100 text-sm font-medium mb-1">Account</p>
+                  <h3 class="text-lg font-bold">Active</h3>
+                </div>
+                <div class="bg-gray-600 dark:bg-gray-900 bg-opacity-20 rounded-full p-3">
+                  <i class="fa-solid fa-user-check text-5xl text-green-500"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Actions -->
+          <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 mb-8">
+            <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-4">Quick Actions</h2>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <button onclick="window.location.href='/user/contacts/add'" 
+                      class="flex flex-col items-center gap-2 p-4 bg-blue-50 dark:bg-gray-700 hover:bg-blue-100 dark:hover:bg-gray-600 rounded-lg transition">
+                <i class="fas fa-user-plus text-2xl text-blue-600 dark:text-blue-400"></i>
+                <span class="text-sm font-medium text-gray-900 dark:text-white">Add Contact</span>
+              </button>
+              <button onclick="window.location.href='/user/contacts'" 
+                      class="flex flex-col items-center gap-2 p-4 bg-green-50 dark:bg-gray-700 hover:bg-green-100 dark:hover:bg-gray-600 rounded-lg transition">
+                <i class="fas fa-address-book text-2xl text-green-600 dark:text-green-400"></i>
+                <span class="text-sm font-medium text-gray-900 dark:text-white">View Contacts</span>
+              </button>
+              <button onclick="window.location.href='/user/groups'" 
+                      class="flex flex-col items-center gap-2 p-4 bg-purple-50 dark:bg-gray-700 hover:bg-purple-100 dark:hover:bg-gray-600 rounded-lg transition">
+                <i class="fas fa-users text-2xl text-purple-600 dark:text-purple-400"></i>
+                <span class="text-sm font-medium text-gray-900 dark:text-white">Manage Groups</span>
+              </button>
+              <button onclick="window.location.href='/user/profile'" 
+                      class="flex flex-col items-center gap-2 p-4 bg-orange-50 dark:bg-gray-700 hover:bg-orange-100 dark:hover:bg-gray-600 rounded-lg transition">
+                <i class="fas fa-user-cog text-2xl text-orange-600 dark:text-orange-400"></i>
+                <span class="text-sm font-medium text-gray-900 dark:text-white">Profile Settings</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Recent Contacts -->
+          <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
+            <div class="flex justify-between items-center mb-4">
+              <h2 class="text-xl font-bold text-gray-900 dark:text-white">Recent Contacts</h2>
+              <a href="/user/contacts" class="text-blue-600 dark:text-blue-400 hover:underline text-sm font-medium">View All</a>
+            </div>
+            <div th:if="${recentContacts == null or recentContacts.isEmpty()}" class="text-center py-8 text-gray-500 dark:text-gray-400">
+              <i class="fas fa-inbox text-4xl mb-2"></i>
+              <p>No contacts yet. Start by adding your first contact!</p>
+            </div>
+            <div class="space-y-3" th:if="${recentContacts != null and !recentContacts.isEmpty()}">
+              <div th:each="contact : ${recentContacts}" 
+                   class="flex items-center gap-4 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition cursor-pointer"
+                   th:data-contact-id="${contact.id}"
+                   onclick="window.location.href='/user/contacts/view/' + this.dataset.contactId">
+                <img th:src="${contact.picture}" th:alt="${contact.name}" 
+                     class="w-12 h-12 rounded-full" 
+                     onerror="this.onerror=null; this.src='/images/unknow_user.png'">
+                <div class="flex-1">
+                  <h3 class="font-semibold text-gray-900 dark:text-white" th:text="${contact.name}"></h3>
+                  <p class="text-sm text-gray-500 dark:text-gray-400" th:text="${contact.email}"></p>
+                </div>
+                <i th:if="${contact.favorite}" class="fas fa-heart text-pink-500"></i>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
 
-    <script>
-      console.log("this is profile page");
-    </script>
+    <script th:fragment="script" th:src="@{/js/dashboard.js}"></script>
   </body>
 </html>

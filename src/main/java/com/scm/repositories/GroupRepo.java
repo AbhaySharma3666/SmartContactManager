@@ -9,4 +9,5 @@ import java.util.List;
 @Repository
 public interface GroupRepo extends JpaRepository<ContactGroup, String> {
     List<ContactGroup> findByUser(User user);
+    long countByUser(User user);
 }
