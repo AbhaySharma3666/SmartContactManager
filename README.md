@@ -9,6 +9,8 @@
 [![MySQL](https://img.shields.io/badge/MySQL-Aiven-blue.svg)](https://aiven.io/)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
+🔗 **[Live Demo](https://smartcontactmanager-gd9j.onrender.com)** 🔗
+
 [Features](#-features) • [Demo](#-demo) • [Installation](#-installation) • [Tech Stack](#-tech-stack) • [Configuration](#-configuration)
 
 </div>
@@ -42,6 +44,10 @@ Smart Contact Manager is a comprehensive, cloud-based contact management solutio
 - SQL injection prevention
 
 ## 🎯 Demo
+
+### 🌐 Live Application
+
+Experience the application live at: **[https://smartcontactmanager-gd9j.onrender.com](https://smartcontactmanager-gd9j.onrender.com)**
 
 <div align="center">
 
