@@ -64,6 +64,12 @@ public class User implements UserDetails {
     private List<Contact> contacts = new ArrayList<>();
 
     @ElementCollection(fetch = FetchType.EAGER)
+    @jakarta.persistence.CollectionTable(
+        name = "user_role_list", 
+        joinColumns = @jakarta.persistence.JoinColumn(name = "user_user_id"),
+        uniqueConstraints = @jakarta.persistence.UniqueConstraint(columnNames = {"user_user_id", "role_list"})
+    )
+    @Column(name = "role_list")
     private List<String> roleList = new ArrayList<>();
 
     private String emailToken;
