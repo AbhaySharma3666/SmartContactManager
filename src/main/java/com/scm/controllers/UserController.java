@@ -135,14 +135,18 @@ public class UserController {
                         form.getProfileImage().getOriginalFilename(),
                         form.getProfileImage().getSize());
                 try {
-                    // Delete old image if exists
+                    // Delete old image if exists and is from Cloudinary
                     String oldProfilePic = user.getProfilePic();
                     if (oldProfilePic != null && !oldProfilePic.isEmpty()
-                            && !oldProfilePic.contains("unknow_user.png")) {
-                        String oldPublicId = oldProfilePic.substring(oldProfilePic.lastIndexOf("/") + 1,
-                                oldProfilePic.lastIndexOf("."));
-                        imageService.deleteImage(oldPublicId);
-                        logger.info("Deleted old profile image: {}", oldPublicId);
+                            && oldProfilePic.contains("cloudinary")) {
+                        try {
+                            String oldPublicId = oldProfilePic.substring(oldProfilePic.lastIndexOf("/") + 1,
+                                    oldProfilePic.lastIndexOf("."));
+                            imageService.deleteImage(oldPublicId);
+                            logger.info("Deleted old profile image: {}", oldPublicId);
+                        } catch (Exception e) {
+                            logger.warn("Could not delete old image: {}", e.getMessage());
+                        }
                     }
 
                     // Create unique filename with timestamp

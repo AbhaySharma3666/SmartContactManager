@@ -12,9 +12,8 @@
       class="flex flex-col items-center ps-2.5 pt-5 pb-5 mb-4 bg-gray-50 dark:bg-gray-900 shadow-md"
     >
       <img 
-              onerror="this.src='/images/unknow_user.png'"
-              data-th-src="@{${loggedInUser.profilePic != null ? loggedInUser.profilePic : '/images/unknow_user.png'}}" 
-              src="/images/unknow_user.png"
+              onerror="this.onerror=null; this.src='https://cdn-icons-png.flaticon.com/512/3135/3135715.png'"
+              th:src="${(loggedInUser.profilePic ?: 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png') + '?t=' + #dates.createNow().time}" 
               alt="Profile Photo" 
               class="w-44 h-44 rounded-full shadow-lg shadow-cyan-500/50 object-cover mb-3">
 
