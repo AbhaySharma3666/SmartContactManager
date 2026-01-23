@@ -30,18 +30,18 @@ public class SmsServiceImpl implements SmsService {
             if (cleanPhone.length() > 10) {
                 cleanPhone = cleanPhone.substring(cleanPhone.length() - 10);
             }
-            
+
             String otp = String.format("%06d", random.nextInt(999999));
             otpStore.put(cleanPhone, otp);
-            
+
             logger.info("Sending OTP to: {}", cleanPhone);
-            
+
             if (apiKey != null && !apiKey.isEmpty()) {
                 try {
                     String url = SMS_OTP_URL.replace("{apiKey}", apiKey)
-                                            .replace("{phoneNumber}", cleanPhone)
-                                            .replace("{otp}", otp);
-                    
+                            .replace("{phoneNumber}", cleanPhone)
+                            .replace("{otp}", otp);
+
                     String response = restTemplate.getForObject(url, String.class);
                     logger.info("2Factor API Response: {}", response);
                     logger.info("SMS sent successfully to {}", cleanPhone);
@@ -51,9 +51,9 @@ public class SmsServiceImpl implements SmsService {
             } else {
                 logger.warn("2Factor API key not configured. OTP: {}", otp);
             }
-            
+
             return otp;
-            
+
         } catch (Exception e) {
             logger.error("Failed to send OTP: {}", e.getMessage());
             return null;
@@ -67,18 +67,18 @@ public class SmsServiceImpl implements SmsService {
             if (cleanPhone.length() > 10) {
                 cleanPhone = cleanPhone.substring(cleanPhone.length() - 10);
             }
-            
+
             String storedOtp = otpStore.get(cleanPhone);
-            
+
             if (storedOtp != null && storedOtp.equals(otp)) {
                 otpStore.remove(cleanPhone);
                 logger.info("OTP verified successfully for {}", cleanPhone);
                 return true;
             }
-            
+
             logger.warn("Invalid OTP for {}", cleanPhone);
             return false;
-            
+
         } catch (Exception e) {
             logger.error("OTP verification failed: {}", e.getMessage());
             return false;

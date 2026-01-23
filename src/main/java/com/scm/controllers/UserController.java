@@ -68,7 +68,7 @@ public class UserController {
 
     @Autowired
     private GroupService groupService;
-    
+
     @Autowired
     private ContactRepo contactRepo;
 
@@ -82,14 +82,14 @@ public class UserController {
         try {
             String username = Helper.getEmailOfLoggedInUser(authentication);
             User user = userService.getUserByEmail(username);
-            
+
             DashboardStats stats = dashboardService.getDashboardStats(user);
-            
+
             model.addAttribute("totalContacts", stats.getTotalContacts());
             model.addAttribute("favoriteContacts", stats.getFavoriteContacts());
             model.addAttribute("totalGroups", stats.getTotalGroups());
             model.addAttribute("recentContacts", stats.getRecentContacts());
-            
+
         } catch (Exception e) {
             logger.error("Error loading dashboard", e);
             model.addAttribute("totalContacts", 0L);
@@ -283,18 +283,18 @@ public class UserController {
         try {
             String username = Helper.getEmailOfLoggedInUser(authentication);
             User user = userService.getUserByEmail(username);
-            
-            if(user == null){
+
+            if (user == null) {
                 logger.error("User not found: {}", username);
                 model.addAttribute("groups", new ArrayList<>());
                 return "user/groups";
             }
-            
+
             List<ContactGroup> groups = groupRepo.findByUser(user);
             logger.info("Found {} groups for user {}", groups.size(), username);
-            
+
             List<Map<String, Object>> groupsWithCount = new ArrayList<>();
-            for(ContactGroup group : groups){
+            for (ContactGroup group : groups) {
                 try {
                     Map<String, Object> groupData = new HashMap<>();
                     groupData.put("groupId", group.getGroupId());
@@ -307,7 +307,7 @@ public class UserController {
                     logger.error("Error processing group: {}", group.getGroupId(), e);
                 }
             }
-            
+
             logger.info("Returning {} groups with data", groupsWithCount.size());
             model.addAttribute("groups", groupsWithCount);
             return "user/groups";
@@ -321,7 +321,8 @@ public class UserController {
     // Create group
     @PostMapping("/groups/create")
     @ResponseBody
-    public Map<String, Object> createGroup(@RequestParam String name, @RequestParam(required = false) String description, Authentication authentication) {
+    public Map<String, Object> createGroup(@RequestParam String name,
+            @RequestParam(required = false) String description, Authentication authentication) {
         Map<String, Object> response = new HashMap<>();
         try {
             String username = Helper.getEmailOfLoggedInUser(authentication);
@@ -364,42 +365,42 @@ public class UserController {
         try {
             String username = Helper.getEmailOfLoggedInUser(authentication);
             User user = userService.getUserByEmail(username);
-            
+
             ContactGroup group = groupService.getGroupById(groupId).orElseThrow();
-            
+
             // Verify group belongs to user
-            if(!group.getUser().getUserId().equals(user.getUserId())){
+            if (!group.getUser().getUserId().equals(user.getUserId())) {
                 return "redirect:/user/groups";
             }
-            
+
             List<GroupMember> members = groupService.getGroupMembers(groupId);
             List<Contact> allContacts = contactRepo.findByUserId(user.getUserId());
-            
+
             model.addAttribute("group", group);
             model.addAttribute("members", members);
             model.addAttribute("memberCount", members.size());
             model.addAttribute("allContacts", allContacts);
-            
+
             return "user/group_details";
         } catch (Exception e) {
             logger.error("Error loading group details", e);
             return "redirect:/user/groups";
         }
     }
-    
+
     // Update group
     @PostMapping("/groups/update/{groupId}")
     @ResponseBody
-    public Map<String, Object> updateGroup(@PathVariable String groupId, 
-                                          @RequestParam String name, 
-                                          @RequestParam(required = false) String description) {
+    public Map<String, Object> updateGroup(@PathVariable String groupId,
+            @RequestParam String name,
+            @RequestParam(required = false) String description) {
         Map<String, Object> response = new HashMap<>();
         try {
             ContactGroup group = groupService.getGroupById(groupId).orElseThrow();
             group.setName(name);
             group.setDescription(description);
             groupService.updateGroup(group);
-            
+
             response.put("success", true);
             response.put("message", "Group updated successfully");
         } catch (Exception e) {
@@ -409,12 +410,12 @@ public class UserController {
         }
         return response;
     }
-    
+
     // Add member to group
     @PostMapping("/groups/{groupId}/add-member")
     @ResponseBody
-    public Map<String, Object> addMemberToGroup(@PathVariable String groupId, 
-                                                @RequestParam String contactId) {
+    public Map<String, Object> addMemberToGroup(@PathVariable String groupId,
+            @RequestParam String contactId) {
         Map<String, Object> response = new HashMap<>();
         try {
             groupService.addMember(groupId, contactId);
@@ -428,12 +429,12 @@ public class UserController {
         }
         return response;
     }
-    
+
     // Remove member from group
     @PostMapping("/groups/{groupId}/remove-member")
     @ResponseBody
-    public Map<String, Object> removeMemberFromGroup(@PathVariable String groupId, 
-                                                     @RequestParam String contactId) {
+    public Map<String, Object> removeMemberFromGroup(@PathVariable String groupId,
+            @RequestParam String contactId) {
         Map<String, Object> response = new HashMap<>();
         try {
             groupService.removeMember(groupId, contactId);
