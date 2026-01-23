@@ -60,9 +60,11 @@ public class User implements UserDetails {
 
     // add more fields if needed
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    @Builder.Default
     private List<Contact> contacts = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+    @Builder.Default
     private List<UserRole> roleList = new ArrayList<>();
 
     private String emailToken;
