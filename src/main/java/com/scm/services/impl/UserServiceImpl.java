@@ -48,7 +48,11 @@ public class UserServiceImpl implements UserService {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
 
         // set the user role
-        user.setRoles(List.of(AppConstants.ROLE_USER));
+        UserRole userRole = UserRole.builder()
+                .role(AppConstants.ROLE_USER)
+                .user(user)
+                .build();
+        user.setRoles(List.of(userRole));
 
         logger.info(user.getProvider().toString());
         String emailToken = UUID.randomUUID().toString();
