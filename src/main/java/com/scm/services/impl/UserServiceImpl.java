@@ -39,7 +39,6 @@ public class UserServiceImpl implements UserService {
     private  Helper helper;
 
     @Override
-    @Async
     public User saveUser(User user) {
         // user id : have to generate
         String userId = UUID.randomUUID().toString();
@@ -58,13 +57,25 @@ public class UserServiceImpl implements UserService {
         String emailToken = UUID.randomUUID().toString();
         user.setEmailToken(emailToken);
         User savedUser = userRepo.save(user);
+        
+        // Send verification email
         String emailLink = helper.getLinkForEmailVerificatiton(emailToken);
-        logger.info("Sending verification email to: {} with link: {}", savedUser.getEmail(), emailLink);
+        String emailBody = "Hello " + savedUser.getName() + ",\n\n" +
+                "Thank you for registering with Smart Contact Manager!\n\n" +
+                "Please click the link below to verify your email address:\n" +
+                emailLink + "\n\n" +
+                "If you did not create this account, please ignore this email.\n\n" +
+                "Best regards,\nSmart Contact Manager Team";
+        
+        logger.info("Sending verification email to: {}", savedUser.getEmail());
+        logger.info("Verification link: {}", emailLink);
+        
         try {
-            emailService.sendEmail(savedUser.getEmail(), "Verify Account : Smart Contact Manager", emailLink);
-            logger.info("Verification email sent successfully to: {}", savedUser.getEmail());
+            emailService.sendEmail(savedUser.getEmail(), "Verify Your Account - Smart Contact Manager", emailBody);
+            logger.info("✅ Verification email sent successfully to: {}", savedUser.getEmail());
         } catch (Exception e) {
-            logger.error("Failed to send verification email to {}: {}", savedUser.getEmail(), e.getMessage(), e);
+            logger.error("❌ Failed to send verification email to {}: {}", savedUser.getEmail(), e.getMessage(), e);
+            // Don't throw exception - user is already saved
         }
         return savedUser;
 
