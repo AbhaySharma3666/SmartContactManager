@@ -44,7 +44,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Random;
 
 @Controller
 @RequestMapping("/user")
@@ -75,8 +74,6 @@ public class UserController {
 
     @Autowired
     private DashboardService dashboardService;
-
-    private Map<String, String> otpStore = new HashMap<>();
 
     // user dashbaord page
 
@@ -188,22 +185,16 @@ public class UserController {
     public Map<String, Object> sendOTP(@RequestParam String phoneNumber, Authentication authentication) {
         Map<String, Object> response = new HashMap<>();
         try {
-            String otp = String.format("%06d", new Random().nextInt(999999));
-            otpStore.put(phoneNumber, otp);
-            logger.info("Generated OTP for {}: {}", phoneNumber, otp);
+            String otp = smsService.sendOtp(phoneNumber);
 
-            String message = "Your OTP for Smart Contact Manager is: " + otp + " Valid for 5 minutes.";
-            boolean smsSent = smsService.sendSms(phoneNumber, message);
-
-            if (smsSent) {
+            if (otp != null) {
                 logger.info("OTP sent successfully to {}", phoneNumber);
                 response.put("success", true);
                 response.put("message", "OTP sent successfully to " + phoneNumber);
             } else {
-                logger.warn("SMS service not configured. Showing OTP in response for testing.");
-                response.put("success", true);
-                response.put("message", "SMS service not configured. Your OTP is: " + otp);
-                response.put("otp", otp); // For testing without SMS
+                logger.error("Failed to send OTP");
+                response.put("success", false);
+                response.put("message", "Failed to send OTP");
             }
         } catch (Exception e) {
             logger.error("Error sending OTP", e);
@@ -220,13 +211,12 @@ public class UserController {
             Authentication authentication) {
         Map<String, Object> response = new HashMap<>();
         try {
-            String storedOtp = otpStore.get(phoneNumber);
-            if (storedOtp != null && storedOtp.equals(otp)) {
+            boolean verified = smsService.verifyOtp(phoneNumber, otp);
+            if (verified) {
                 String username = Helper.getEmailOfLoggedInUser(authentication);
                 User user = userService.getUserByEmail(username);
                 user.setPhoneVerified(true);
                 userService.updateUser(user);
-                otpStore.remove(phoneNumber);
                 response.put("success", true);
                 response.put("message", "Phone verified successfully");
             } else {

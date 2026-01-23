@@ -1,63 +1,86 @@
 package com.scm.services.impl;
 
+import com.scm.services.SmsService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-
-import com.scm.services.SmsService;
-import com.twilio.Twilio;
-import com.twilio.rest.api.v2010.account.Message;
-import com.twilio.type.PhoneNumber;
+import org.springframework.web.client.RestTemplate;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.Random;
 
 @Service
 public class SmsServiceImpl implements SmsService {
 
-    private Logger logger = LoggerFactory.getLogger(SmsServiceImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(SmsServiceImpl.class);
+    private final Map<String, String> otpStore = new ConcurrentHashMap<>();
+    private final Random random = new Random();
 
-    @Value("${twilio.account.sid:}")
-    private String accountSid;
+    @Value("${twofactor.api.key:}")
+    private String apiKey;
 
-    @Value("${twilio.auth.token:}")
-    private String authToken;
-
-    @Value("${twilio.phone.number:}")
-    private String fromPhoneNumber;
+    private static final String SMS_OTP_URL = "https://2factor.in/API/V1/{apiKey}/SMS/{phoneNumber}/{otp}";
 
     @Override
-    public boolean sendSms(String phoneNumber, String messageText) {
+    public String sendOtp(String phoneNumber) {
         try {
-            logger.info("Attempting to send SMS to: {}", phoneNumber);
-            logger.info("Twilio Account SID configured: {}", !accountSid.isEmpty());
-            logger.info("Twilio Auth Token configured: {}", !authToken.isEmpty());
-            logger.info("Twilio Phone Number configured: {}", fromPhoneNumber);
-            
-            // Check if Twilio is configured
-            if (accountSid.isEmpty() || authToken.isEmpty() || fromPhoneNumber.isEmpty()) {
-                logger.warn("Twilio not configured. SMS not sent. Message: {}", messageText);
-                return false;
+            String cleanPhone = phoneNumber.replaceAll("[^0-9]", "");
+            if (cleanPhone.length() > 10) {
+                cleanPhone = cleanPhone.substring(cleanPhone.length() - 10);
             }
-
-            // Validate phone number format
-            if (!phoneNumber.startsWith("+")) {
-                logger.error("Phone number must be in international format starting with +");
-                return false;
-            }
-
-            Twilio.init(accountSid, authToken);
-            logger.info("Twilio initialized successfully");
             
-            Message message = Message.creator(
-                    new PhoneNumber(phoneNumber),
-                    new PhoneNumber(fromPhoneNumber),
-                    messageText)
-                .create();
-
-            logger.info("SMS sent successfully to {}. SID: {}, Status: {}", 
-                phoneNumber, message.getSid(), message.getStatus());
-            return true;
+            String otp = String.format("%06d", random.nextInt(999999));
+            otpStore.put(cleanPhone, otp);
+            
+            logger.info("Sending OTP to: {}", cleanPhone);
+            
+            if (apiKey != null && !apiKey.isEmpty()) {
+                try {
+                    RestTemplate restTemplate = new RestTemplate();
+                    String url = SMS_OTP_URL.replace("{apiKey}", apiKey)
+                                            .replace("{phoneNumber}", cleanPhone)
+                                            .replace("{otp}", otp);
+                    
+                    String response = restTemplate.getForObject(url, String.class);
+                    logger.info("2Factor API Response: {}", response);
+                    logger.info("✅ SMS sent successfully to {}", cleanPhone);
+                } catch (Exception e) {
+                    logger.error("Failed to send SMS via 2Factor: {}", e.getMessage());
+                }
+            } else {
+                logger.warn("2Factor API key not configured. OTP: {}", otp);
+            }
+            
+            return otp;
+            
         } catch (Exception e) {
-            logger.error("Failed to send SMS to {}: {}", phoneNumber, e.getMessage(), e);
+            logger.error("Failed to send OTP: {}", e.getMessage());
+            return null;
+        }
+    }
+
+    @Override
+    public boolean verifyOtp(String phoneNumber, String otp) {
+        try {
+            String cleanPhone = phoneNumber.replaceAll("[^0-9]", "");
+            if (cleanPhone.length() > 10) {
+                cleanPhone = cleanPhone.substring(cleanPhone.length() - 10);
+            }
+            
+            String storedOtp = otpStore.get(cleanPhone);
+            
+            if (storedOtp != null && storedOtp.equals(otp)) {
+                otpStore.remove(cleanPhone);
+                logger.info("✅ OTP verified successfully for {}", cleanPhone);
+                return true;
+            }
+            
+            logger.warn("❌ Invalid OTP for {}", cleanPhone);
+            return false;
+            
+        } catch (Exception e) {
+            logger.error("OTP verification failed: {}", e.getMessage());
             return false;
         }
     }

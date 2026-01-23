@@ -1,5 +1,6 @@
 package com.scm.services;
 
 public interface SmsService {
-    boolean sendSms(String phoneNumber, String message);
+    String sendOtp(String phoneNumber);
+    boolean verifyOtp(String phoneNumber, String otp);
 }

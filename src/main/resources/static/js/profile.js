@@ -36,16 +36,6 @@ function sendOTP() {
     return;
   }
 
-  if (!phone.startsWith('+')) {
-    Swal.fire({
-      icon: 'error',
-      title: 'Error',
-      text: 'Phone number must start with + and country code (e.g., +919876543210)',
-      theme: 'auto'
-    });
-    return;
-  }
-
   Swal.fire({
     title: 'Sending OTP...',
     text: 'Please wait',

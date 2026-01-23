@@ -101,7 +101,7 @@ Experience the application live at: **[https://smartcontactmanager-gd9j.onrender
 ### Third-Party Services
 - **Cloudinary** - Image storage and CDN
 - **Gmail SMTP** - Email service
-- **Twilio** - SMS notifications
+- **Firebase Authentication** - SMS OTP verification
 - **Google OAuth2** - Social authentication
 - **GitHub OAuth2** - Social authentication
 
@@ -200,13 +200,18 @@ CLOUDINARY_API_SECRET=your-api-secret
 ```
 Sign up at [Cloudinary](https://cloudinary.com/)
 
-#### Twilio Configuration (Optional - for SMS features)
+#### Firebase SMS OTP Configuration (Optional - for SMS OTP features)
 ```env
-TWILIO_ACCOUNT_SID=your-account-sid
-TWILIO_AUTH_TOKEN=your-auth-token
-TWILIO_PHONE_NUMBER=your-twilio-phone-number
+FIREBASE_PROJECT_ID=smart-contact-manager-72b91
+FIREBASE_PRIVATE_KEY=your-firebase-private-key
+FIREBASE_CLIENT_EMAIL=firebase-adminsdk-xxxxx@smart-contact-manager-72b91.iam.gserviceaccount.com
 ```
-Sign up at [Twilio](https://www.twilio.com/)
+
+**Setup Firebase:**
+1. Go to [Firebase Console](https://console.firebase.google.com/project/smart-contact-manager-72b91/settings/serviceaccounts/adminsdk)
+2. Click "Generate new private key"
+3. Copy `project_id`, `private_key`, and `client_email` from the JSON to your `.env` file
+4. Enable **Authentication** → **Phone** provider in Firebase Console
 
 ## 🗄️ Database Setup
 
