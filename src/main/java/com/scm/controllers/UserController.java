@@ -247,8 +247,9 @@ public class UserController {
 
     // Submit feedback
     @PostMapping("/feedback")
-    public String submitFeedback(@ModelAttribute FeedbackForm form, HttpSession session,
-            Authentication authentication) {
+    @ResponseBody
+    public Map<String, Object> submitFeedback(@ModelAttribute FeedbackForm form, Authentication authentication) {
+        Map<String, Object> response = new HashMap<>();
         try {
             String username = Helper.getEmailOfLoggedInUser(authentication);
             User user = userService.getUserByEmail(username);
@@ -258,23 +259,22 @@ public class UserController {
             feedback.setSubject(form.getSubject());
             feedback.setMessage(form.getMessage());
             feedback.setRating(form.getRating());
-            feedback.setCreatedAt(java.time.LocalDateTime.now());
+            feedback.setCreatedAt(LocalDateTime.now());
+            feedback.setUserName(user.getName());
+            feedback.setUserEmail(user.getEmail());
+            feedback.setUserContact(user.getPhoneNumber());
             feedback.setUser(user);
 
             feedbackRepo.save(feedback);
 
-            session.setAttribute("message", Message.builder()
-                    .content("Thank you for your feedback!")
-                    .type(MessageType.green)
-                    .build());
+            response.put("success", true);
+            response.put("message", "Thank you for your feedback!");
         } catch (Exception e) {
             logger.error("Error submitting feedback", e);
-            session.setAttribute("message", Message.builder()
-                    .content("Failed to submit feedback")
-                    .type(MessageType.red)
-                    .build());
+            response.put("success", false);
+            response.put("message", "Failed to submit feedback");
         }
-        return "redirect:/user/feedback";
+        return response;
     }
 
     // Groups page

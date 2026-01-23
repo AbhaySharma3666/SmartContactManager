@@ -2,7 +2,9 @@ package com.scm;
 
 import com.scm.config.AppConfig;
 import com.scm.entities.User;
+import com.scm.entities.UserRole;
 import com.scm.helpers.AppConstants;
+import com.scm.helpers.RoleHelper;
 import com.scm.repositories.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -33,13 +35,14 @@ public class SmartContactManagerApplication implements CommandLineRunner {
 		user.setName("admin");
 		user.setEmail("admin@gmail.com");
 		user.setPassword(passwordEncoder.encode("admin"));
-		user.setRoleList(List.of(AppConstants.ROLE_USER));
 		user.setEmailVerified(true);
 		user.setEnabled(true);
 		user.setAbout("This is dummy user created initially");
 		user.setPhoneVerified(true);
 
 		userRepo.findByEmail("admin@gmail.com").ifPresentOrElse(user1 -> {},() -> {
+			UserRole userRole = RoleHelper.createRole(AppConstants.ROLE_USER, user);
+			user.setRoleList(List.of(userRole));
 			userRepo.save(user);
 			System.out.println("user created");
 		});

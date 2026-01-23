@@ -32,6 +32,14 @@ public class Feedback {
     
     private LocalDateTime createdAt;
     
+    @Column(nullable = false)
+    private String userName;
+    
+    @Column(nullable = false)
+    private String userEmail;
+    
+    private String userContact;
+    
     @ManyToOne
     private User user;
 }

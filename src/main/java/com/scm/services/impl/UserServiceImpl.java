@@ -11,9 +11,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.scm.entities.User;
+import com.scm.entities.UserRole;
 import com.scm.helpers.AppConstants;
 import com.scm.helpers.Helper;
 import com.scm.helpers.ResourceNotFoundException;
+import com.scm.helpers.RoleHelper;
 import com.scm.repositories.UserRepo;
 import com.scm.services.EmailService;
 import com.scm.services.UserService;
@@ -46,8 +48,8 @@ public class UserServiceImpl implements UserService {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
 
         // set the user role
-
-        user.setRoleList(List.of(AppConstants.ROLE_USER));
+        UserRole userRole = RoleHelper.createRole(AppConstants.ROLE_USER, user);
+        user.setRoleList(List.of(userRole));
 
         logger.info(user.getProvider().toString());
         String emailToken = UUID.randomUUID().toString();

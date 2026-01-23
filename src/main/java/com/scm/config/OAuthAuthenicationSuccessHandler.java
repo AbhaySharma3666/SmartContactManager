@@ -15,7 +15,9 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import com.scm.entities.Providers;
 import com.scm.entities.User;
+import com.scm.entities.UserRole;
 import com.scm.helpers.AppConstants;
+import com.scm.helpers.RoleHelper;
 import com.scm.repositories.UserRepo;
 
 import jakarta.servlet.ServletException;
@@ -54,7 +56,6 @@ public class OAuthAuthenicationSuccessHandler implements AuthenticationSuccessHa
 
         User user = new User();
         user.setUserId(UUID.randomUUID().toString());
-        user.setRoleList(List.of(AppConstants.ROLE_USER));
         user.setEmailVerified(true);
         user.setEnabled(true);
         user.setPassword("dummy");
@@ -150,6 +151,8 @@ public class OAuthAuthenicationSuccessHandler implements AuthenticationSuccessHa
 
         User user2 = userRepo.findByEmail(user.getEmail()).orElse(null);
         if (user2 == null) {
+            UserRole userRole = RoleHelper.createRole(AppConstants.ROLE_USER, user);
+            user.setRoleList(List.of(userRole));
             userRepo.save(user);
             System.out.println("user saved:" + user.getEmail());
         }

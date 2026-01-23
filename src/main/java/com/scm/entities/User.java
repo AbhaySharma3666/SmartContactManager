@@ -2,7 +2,6 @@ package com.scm.entities;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
-import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -63,24 +62,16 @@ public class User implements UserDetails {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private List<Contact> contacts = new ArrayList<>();
 
-    @ElementCollection(fetch = FetchType.EAGER)
-    @jakarta.persistence.CollectionTable(
-        name = "user_role_list", 
-        joinColumns = @jakarta.persistence.JoinColumn(name = "user_user_id"),
-        uniqueConstraints = @jakarta.persistence.UniqueConstraint(columnNames = {"user_user_id", "role_list"})
-    )
-    @Column(name = "role_list")
-    private List<String> roleList = new ArrayList<>();
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+    private List<UserRole> roleList = new ArrayList<>();
 
     private String emailToken;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        // list of roles[USER,ADMIN]
-        // Collection of SimpGrantedAuthority[roles{ADMIN,USER}]
-        Collection<SimpleGrantedAuthority> roles = roleList.stream().map(role -> new SimpleGrantedAuthority(role))
+        return roleList.stream()
+                .map(userRole -> new SimpleGrantedAuthority(userRole.getRole()))
                 .collect(Collectors.toList());
-        return roles;
     }
 
     // for this project:
