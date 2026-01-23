@@ -18,19 +18,24 @@ public class EmailServiceImpl implements EmailService {
     @Autowired
     private JavaMailSender eMailSender;
 
-    @Value("${spring.mail.properties.domain_name}")
-    private String domainName;
+    @Value("${SENDGRID_FROM_EMAIL:noreply@yourdomain.com}")
+    private String fromEmail;
+
+    @Value("${SENDGRID_FROM_NAME:Smart Contact Manager}")
+    private String fromName;
 
     @Override
     public void sendEmail(String to, String subject, String body) {
-
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setTo(to);
-        message.setFrom(domainName);
-        message.setSubject(subject);
-        message.setText(body);
-        eMailSender.send(message);
-
+        try {
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setTo(to);
+            message.setFrom(fromEmail);
+            message.setSubject(subject);
+            message.setText(body);
+            eMailSender.send(message);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to send email: " + e.getMessage(), e);
+        }
     }
 
     @Override
@@ -50,7 +55,7 @@ public class EmailServiceImpl implements EmailService {
             MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
             
             helper.setTo(to);
-            helper.setFrom(domainName);
+            helper.setFrom(fromEmail, fromName);
             helper.setSubject(subject);
             helper.setText(body);
             

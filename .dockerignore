@@ -1,4 +1,16 @@
 target/
-.git/
+!target/SmartContactManager-*.jar
+.mvn/wrapper/maven-wrapper.jar
+.git
+.gitignore
+*.md
 .env
+.env.example
 *.log
+*.tmp
+.DS_Store
+Thumbs.db
+node_modules/
+.vscode/
+.idea/
+*.iml
