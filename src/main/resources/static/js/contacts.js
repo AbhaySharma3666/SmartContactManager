@@ -213,8 +213,12 @@ document.getElementById('email_form')?.addEventListener('submit', async function
   try {
     const response = await fetch(`${baseURL}/api/send-email`, {
       method: 'POST',
-      body: formData
+      body: formData,
+      credentials: 'same-origin'
     });
+
+    const responseText = await response.text();
+    console.log('Server response:', responseText);
 
     if (response.ok) {
       Swal.fire({
@@ -229,13 +233,13 @@ document.getElementById('email_form')?.addEventListener('submit', async function
       });
       closeEmailModal();
     } else {
-      throw new Error('Failed to send email');
+      throw new Error(responseText || 'Failed to send email');
     }
   } catch (error) {
-    console.log('Error:', error);
+    console.error('Email send error:', error);
     Swal.fire({
       title: 'Error!',
-      text: 'Failed to send email. Please try again.',
+      text: error.message || 'Failed to send email. Please try again.',
       icon: 'error',
       timer: 3000,
       position: 'top-end',
