@@ -5,5 +5,5 @@ import org.springframework.stereotype.Repository;
 import com.scm.entities.UserRole;
 
 @Repository
-public interface UserRoleRepo extends JpaRepository<UserRole, Long> {
+public interface UserRoleRepo extends JpaRepository<UserRole, String> {
 }
