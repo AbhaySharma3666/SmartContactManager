@@ -65,13 +65,13 @@ public class User implements UserDetails {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
     @Builder.Default
-    private List<UserRole> roleList = new ArrayList<>();
+    private List<UserRole> roles = new ArrayList<>();
 
     private String emailToken;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return roleList.stream()
+        return roles.stream()
                 .map(userRole -> new SimpleGrantedAuthority(userRole.getRole()))
                 .collect(Collectors.toList());
     }

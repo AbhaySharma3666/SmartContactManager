@@ -42,7 +42,7 @@ public class SmartContactManagerApplication implements CommandLineRunner {
 
 		userRepo.findByEmail("admin@gmail.com").ifPresentOrElse(user1 -> {},() -> {
 			UserRole userRole = RoleHelper.createRole(AppConstants.ROLE_USER, user);
-			user.setRoleList(List.of(userRole));
+			user.setRoles(List.of(userRole));
 			userRepo.save(user);
 			System.out.println("user created");
 		});

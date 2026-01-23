@@ -49,7 +49,7 @@ public class UserServiceImpl implements UserService {
 
         // set the user role
         UserRole userRole = RoleHelper.createRole(AppConstants.ROLE_USER, user);
-        user.setRoleList(List.of(userRole));
+        user.setRoles(List.of(userRole));
 
         logger.info(user.getProvider().toString());
         String emailToken = UUID.randomUUID().toString();
