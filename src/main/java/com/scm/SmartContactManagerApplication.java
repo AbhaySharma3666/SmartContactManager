@@ -41,8 +41,7 @@ public class SmartContactManagerApplication implements CommandLineRunner {
 		user.setPhoneVerified(true);
 
 		userRepo.findByEmail("admin@gmail.com").ifPresentOrElse(user1 -> {},() -> {
-			UserRole userRole = RoleHelper.createRole(AppConstants.ROLE_USER, user);
-			user.setRoles(List.of(userRole));
+			user.setRoles(List.of(AppConstants.ROLE_USER));
 			userRepo.save(user);
 			System.out.println("user created");
 		});

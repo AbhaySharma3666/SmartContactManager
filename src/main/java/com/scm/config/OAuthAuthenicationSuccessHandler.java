@@ -151,8 +151,7 @@ public class OAuthAuthenicationSuccessHandler implements AuthenticationSuccessHa
 
         User user2 = userRepo.findByEmail(user.getEmail()).orElse(null);
         if (user2 == null) {
-            UserRole userRole = RoleHelper.createRole(AppConstants.ROLE_USER, user);
-            user.setRoles(List.of(userRole));
+            user.setRoles(List.of(AppConstants.ROLE_USER));
             userRepo.save(user);
             System.out.println("user saved:" + user.getEmail());
         }
