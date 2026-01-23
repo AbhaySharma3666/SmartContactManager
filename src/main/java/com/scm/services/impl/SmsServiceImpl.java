@@ -16,6 +16,7 @@ public class SmsServiceImpl implements SmsService {
     private static final Logger logger = LoggerFactory.getLogger(SmsServiceImpl.class);
     private final Map<String, String> otpStore = new ConcurrentHashMap<>();
     private final Random random = new Random();
+    private final RestTemplate restTemplate = new RestTemplate();
 
     @Value("${twofactor.api.key:}")
     private String apiKey;
@@ -37,14 +38,13 @@ public class SmsServiceImpl implements SmsService {
             
             if (apiKey != null && !apiKey.isEmpty()) {
                 try {
-                    RestTemplate restTemplate = new RestTemplate();
                     String url = SMS_OTP_URL.replace("{apiKey}", apiKey)
                                             .replace("{phoneNumber}", cleanPhone)
                                             .replace("{otp}", otp);
                     
                     String response = restTemplate.getForObject(url, String.class);
                     logger.info("2Factor API Response: {}", response);
-                    logger.info("✅ SMS sent successfully to {}", cleanPhone);
+                    logger.info("SMS sent successfully to {}", cleanPhone);
                 } catch (Exception e) {
                     logger.error("Failed to send SMS via 2Factor: {}", e.getMessage());
                 }
@@ -72,11 +72,11 @@ public class SmsServiceImpl implements SmsService {
             
             if (storedOtp != null && storedOtp.equals(otp)) {
                 otpStore.remove(cleanPhone);
-                logger.info("✅ OTP verified successfully for {}", cleanPhone);
+                logger.info("OTP verified successfully for {}", cleanPhone);
                 return true;
             }
             
-            logger.warn("❌ Invalid OTP for {}", cleanPhone);
+            logger.warn("Invalid OTP for {}", cleanPhone);
             return false;
             
         } catch (Exception e) {
