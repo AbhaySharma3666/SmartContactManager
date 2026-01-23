@@ -49,8 +49,8 @@ public class Helper {
     }
 
     public String getLinkForEmailVerificatiton(String emailToken) {
-
-        return this.baseUrl + "/auth/verify-email?token=" + emailToken;
-
+        String link = this.baseUrl + "/auth/verify-email?token=" + emailToken;
+        System.out.println("🔗 Generated verification link: " + link);
+        return link;
     }
 }
