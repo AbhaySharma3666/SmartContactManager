@@ -33,7 +33,10 @@ public class EmailServiceImpl implements EmailService {
             message.setSubject(subject);
             message.setText(body);
             eMailSender.send(message);
+            System.out.println("✅ Email sent successfully to: " + to);
         } catch (Exception e) {
+            System.err.println("❌ Failed to send email to " + to + ": " + e.getMessage());
+            e.printStackTrace();
             throw new RuntimeException("Failed to send email: " + e.getMessage(), e);
         }
     }
