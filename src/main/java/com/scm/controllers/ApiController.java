@@ -90,13 +90,19 @@ public class ApiController {
             @RequestParam("message") String message,
             @RequestParam(value = "attachment", required = false) MultipartFile attachment) {
         try {
+            logger.info("Attempting to send email to: {}", to);
+            logger.info("Subject: {}", subject);
+            logger.info("Has attachment: {}", attachment != null && !attachment.isEmpty());
+            
             if (attachment != null && !attachment.isEmpty()) {
                 emailService.sendEmailWithAttachment(to, subject, message, attachment);
             } else {
                 emailService.sendEmail(to, subject, message);
             }
+            logger.info("Email sent successfully to: {}", to);
             return ResponseEntity.ok("Email sent successfully");
         } catch (Exception e) {
+            logger.error("Failed to send email: {}", e.getMessage(), e);
             return ResponseEntity.status(500).body("Failed to send email: " + e.getMessage());
         }
     }

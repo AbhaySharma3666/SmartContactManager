@@ -67,6 +67,7 @@ public DaoAuthenticationProvider authenticationProvider() {
         httpSecurity.authorizeHttpRequests(authorize -> {
             // authorize.requestMatchers("/home", "/register", "/services").permitAll();
             authorize.requestMatchers("/user/**").authenticated();
+            authorize.requestMatchers("/api/**").authenticated();
             authorize.anyRequest().permitAll();
         });
 
@@ -113,7 +114,9 @@ public DaoAuthenticationProvider authenticationProvider() {
 
         });
 
-        httpSecurity.csrf(AbstractHttpConfigurer::disable);
+        httpSecurity.csrf(csrf -> csrf
+            .ignoringRequestMatchers("/api/**")
+        );
         // oauth configurations
 
         httpSecurity.oauth2Login(oauth -> {
