@@ -18,10 +18,10 @@ public class EmailServiceImpl implements EmailService {
     @Autowired
     private JavaMailSender eMailSender;
 
-    @Value("${SENDGRID_FROM_EMAIL:noreply@yourdomain.com}")
+    @Value("${BREVO_FROM_EMAIL:noreply@yourdomain.com}")
     private String fromEmail;
 
-    @Value("${SENDGRID_FROM_NAME:Smart Contact Manager}")
+    @Value("${BREVO_FROM_NAME:Smart Contact Manager}")
     private String fromName;
 
     @Override
