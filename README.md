@@ -9,7 +9,7 @@
 [![MySQL](https://img.shields.io/badge/MySQL-Aiven-blue.svg)](https://aiven.io/)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-🔗 **[Live Demo](https://smartcontactmanager-gd9j.onrender.com)** 🔗
+🔗 **[Live Demo](https://smartcontactmanager-538y.onrender.com)** 🔗
 
 [Features](#-features) • [Demo](#-demo) • [Installation](#-installation) • [Tech Stack](#-tech-stack) • [Configuration](#-configuration)
 
