@@ -1,13 +1,55 @@
 // Update contact form handler
 
-function validateFileSize(input) {
-  const maxSize = 2 * 1024 * 1024; // 2MB in bytes
-  if (input.files[0] && input.files[0].size > maxSize) {
-    alert('File size must be less than 2MB. Please select a smaller image.');
-    input.value = '';
-    const preview = document.getElementById('upload_image_preview');
-    if (preview) preview.src = preview.getAttribute('data-th-src') || '';
+async function validateFileSize(input) {
+  if (!input.files[0]) return;
+  
+  const file = input.files[0];
+  const maxSize = 1 * 1024 * 1024; // 1MB
+  
+  if (file.size > maxSize) {
+    const compressed = await compressImage(file);
+    const dt = new DataTransfer();
+    dt.items.add(compressed);
+    input.files = dt.files;
   }
+  
+  const reader = new FileReader();
+  reader.onload = (e) => document.getElementById('upload_image_preview').src = e.target.result;
+  reader.readAsDataURL(input.files[0]);
+}
+
+function compressImage(file) {
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        let width = img.width;
+        let height = img.height;
+        const maxDim = 1200;
+        
+        if (width > height && width > maxDim) {
+          height *= maxDim / width;
+          width = maxDim;
+        } else if (height > maxDim) {
+          width *= maxDim / height;
+          height = maxDim;
+        }
+        
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+        
+        canvas.toBlob((blob) => {
+          resolve(new File([blob], file.name, { type: 'image/jpeg' }));
+        }, 'image/jpeg', 0.7);
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
 }
 
 document.addEventListener('DOMContentLoaded', function() {
