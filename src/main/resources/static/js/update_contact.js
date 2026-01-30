@@ -1,4 +1,15 @@
 // Update contact form handler
+
+function validateFileSize(input) {
+  const maxSize = 2 * 1024 * 1024; // 2MB in bytes
+  if (input.files[0] && input.files[0].size > maxSize) {
+    alert('File size must be less than 2MB. Please select a smaller image.');
+    input.value = '';
+    const preview = document.getElementById('upload_image_preview');
+    if (preview) preview.src = preview.getAttribute('data-th-src') || '';
+  }
+}
+
 document.addEventListener('DOMContentLoaded', function() {
   const updateForm = document.querySelector('form[action*="/user/contacts/update/"]');
   

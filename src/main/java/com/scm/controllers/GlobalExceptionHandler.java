@@ -12,7 +12,7 @@ public class GlobalExceptionHandler {
     public String handleMaxSizeException(MaxUploadSizeExceededException exc, RedirectAttributes redirectAttributes) {
         redirectAttributes.addFlashAttribute("message", 
             com.scm.helpers.Message.builder()
-                .content("File size exceeds maximum limit of 10MB")
+                .content("File size exceeds maximum limit of 2MB")
                 .type(com.scm.helpers.MessageType.red)
                 .build());
         return "redirect:/user/contacts/add";
