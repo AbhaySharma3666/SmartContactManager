@@ -13,7 +13,9 @@ import com.scm.services.EmailService;
 import jakarta.mail.internet.MimeMessage;
 
 @Service
-public class EmailServiceImpl implements EmailService {
+public class
+
+EmailServiceImpl implements EmailService {
 
     @Autowired
     private JavaMailSender eMailSender;

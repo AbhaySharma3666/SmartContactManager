@@ -2,7 +2,7 @@ package com.scm.services;
 
 import org.springframework.web.multipart.MultipartFile;
 
-public interface EmailService {
+public interface    EmailService {
 
     void sendEmail(String to, String subject, String body);
 
