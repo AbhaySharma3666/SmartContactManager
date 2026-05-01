@@ -2,7 +2,6 @@ package com.scm.controllers;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -12,29 +11,27 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.scm.entities.User;
-import com.scm.forms.FeedbackForm;
-import com.scm.forms.GroupForm;
-import com.scm.forms.UserUpdateForm;
-import com.scm.helpers.Helper;
-import com.scm.helpers.Message;
-import com.scm.helpers.MessageType;
-import com.scm.services.GroupService;
-import com.scm.services.ImageService;
-import com.scm.services.SmsService;
-import com.scm.services.UserService;
-import com.scm.services.DashboardService;
 import com.scm.entities.Contact;
 import com.scm.entities.ContactGroup;
 import com.scm.entities.Feedback;
 import com.scm.entities.GroupMember;
 import com.scm.entities.DashboardStats;
+import com.scm.forms.FeedbackForm;
+import com.scm.forms.UserUpdateForm;
+import com.scm.helpers.Helper;
+import com.scm.helpers.Message;
+import com.scm.helpers.MessageType;
 import com.scm.repositories.ContactRepo;
 import com.scm.repositories.FeedbackRepo;
 import com.scm.repositories.GroupRepo;
+import com.scm.services.GroupService;
+import com.scm.services.ImageService;
+import com.scm.services.SmsService;
+import com.scm.services.UserService;
+import com.scm.services.DashboardService;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -43,40 +40,36 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 @Controller
 @RequestMapping("/user")
 public class UserController {
 
-    private Logger logger = LoggerFactory.getLogger(UserController.class);
+    private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
+    private final ImageService imageService;
+    private final SmsService smsService;
+    private final FeedbackRepo feedbackRepo;
+    private final GroupRepo groupRepo;
+    private final GroupService groupService;
+    private final ContactRepo contactRepo;
+    private final DashboardService dashboardService;
 
-    @Autowired
-    private ImageService imageService;
+    public UserController(UserService userService, ImageService imageService,
+            SmsService smsService, FeedbackRepo feedbackRepo, GroupRepo groupRepo,
+            GroupService groupService, ContactRepo contactRepo, DashboardService dashboardService) {
+        this.userService = userService;
+        this.imageService = imageService;
+        this.smsService = smsService;
+        this.feedbackRepo = feedbackRepo;
+        this.groupRepo = groupRepo;
+        this.groupService = groupService;
+        this.contactRepo = contactRepo;
+        this.dashboardService = dashboardService;
+    }
 
-    @Autowired
-    private SmsService smsService;
-
-    @Autowired
-    private FeedbackRepo feedbackRepo;
-
-    @Autowired
-    private GroupRepo groupRepo;
-
-    @Autowired
-    private GroupService groupService;
-
-    @Autowired
-    private ContactRepo contactRepo;
-
-    @Autowired
-    private DashboardService dashboardService;
-
-    // user dashbaord page
-
+    // user dashboard page
     @RequestMapping(value = "/dashboard")
     public String userDashboard(Model model, Authentication authentication) {
         try {
@@ -101,7 +94,6 @@ public class UserController {
     }
 
     // user profile page
-
     @RequestMapping(value = "/profile")
     public String userProfile(Model model, Authentication authentication) {
         return "user/profile";
@@ -159,11 +151,9 @@ public class UserController {
                 }
             }
 
-            Optional<User> updatedUserOpt = userService.updateUser(user);
-            if (updatedUserOpt.isPresent()) {
-                User updatedUser = updatedUserOpt.get();
-                logger.info("Profile updated successfully. New profile pic: {}", updatedUser.getProfilePic());
-            }
+            var updatedUserOpt = userService.updateUser(user);
+            updatedUserOpt.ifPresent(updatedUser ->
+                    logger.info("Profile updated successfully. New profile pic: {}", updatedUser.getProfilePic()));
 
             session.setAttribute("message", Message.builder()
                     .content("Profile updated successfully")
@@ -229,14 +219,6 @@ public class UserController {
         }
         return response;
     }
-
-    // user add contacts page
-
-    // user view contacts
-
-    // user edit contact
-
-    // user delete contact
 
     // Feedback page
     @GetMapping("/feedback")
@@ -448,5 +430,4 @@ public class UserController {
         }
         return response;
     }
-
 }

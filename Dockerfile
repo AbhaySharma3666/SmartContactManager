@@ -27,16 +27,13 @@ USER spring:spring
 # Copy jar from build stage
 COPY --from=build /app/target/SmartContactManager-*.jar app.jar
 
-# Expose port
+# Expose port (Render uses PORT env var)
 EXPOSE 8080
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=3s --start-period=60s --retries=3 \
-  CMD wget --no-verbose --tries=1 --spider http://localhost:8080/actuator/health || exit 1
-
-# Run application with optimized JVM settings
+# Run application with optimized JVM settings for container
 ENTRYPOINT ["java", \
   "-Djava.security.egd=file:/dev/./urandom", \
-  "-Dspring.profiles.active=prod", \
+  "-XX:+UseContainerSupport", \
+  "-XX:MaxRAMPercentage=75.0", \
   "-jar", \
   "app.jar"]

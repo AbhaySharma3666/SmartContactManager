@@ -2,11 +2,11 @@ package com.scm.config;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
@@ -27,10 +27,13 @@ import jakarta.servlet.http.HttpServletResponse;
 @Component
 public class OAuthAuthenicationSuccessHandler implements AuthenticationSuccessHandler {
 
-    Logger logger = LoggerFactory.getLogger(OAuthAuthenicationSuccessHandler.class);
+    private static final Logger logger = LoggerFactory.getLogger(OAuthAuthenicationSuccessHandler.class);
 
-    @Autowired
-    private UserRepo userRepo;
+    private final UserRepo userRepo;
+
+    public OAuthAuthenicationSuccessHandler(UserRepo userRepo) {
+        this.userRepo = userRepo;
+    }
 
     @Override
     public void onAuthenticationSuccess(
@@ -40,128 +43,95 @@ public class OAuthAuthenicationSuccessHandler implements AuthenticationSuccessHa
 
         logger.info("OAuthAuthenicationSuccessHandler");
 
-        // identify the provider
-
         var oauth2AuthenicationToken = (OAuth2AuthenticationToken) authentication;
-
         String authorizedClientRegistrationId = oauth2AuthenicationToken.getAuthorizedClientRegistrationId();
 
-        logger.info(authorizedClientRegistrationId);
+        logger.info("Provider: {}", authorizedClientRegistrationId);
 
         var oauthUser = (DefaultOAuth2User) authentication.getPrincipal();
 
         oauthUser.getAttributes().forEach((key, value) -> {
-            logger.info(key + " : " + value);
+            logger.info("{} : {}", key, value);
         });
 
-        User user = new User();
-        user.setUserId(UUID.randomUUID().toString());
-        user.setEmailVerified(true);
-        user.setEnabled(true);
-        user.setPassword("dummy");
+        // Extract user attributes based on provider
+        String email = null;
+        String name = null;
+        String profilePic = null;
+        String providerUserId = oauthUser.getName();
+        Providers provider = null;
+        String about = null;
 
         if (authorizedClientRegistrationId.equalsIgnoreCase("google")) {
-
-            // google
-            // google attributes
-
-            user.setEmail(oauthUser.getAttribute("email").toString());
-            user.setProfilePic(oauthUser.getAttribute("picture").toString());
-            user.setName(oauthUser.getAttribute("name").toString());
-            user.setProviderUserId(oauthUser.getName());
-            user.setProvider(Providers.GOOGLE);
-            user.setAbout("This account is created using google.");
+            email = Objects.toString(oauthUser.getAttribute("email"), null);
+            profilePic = Objects.toString(oauthUser.getAttribute("picture"), null);
+            name = Objects.toString(oauthUser.getAttribute("name"), "Google User");
+            provider = Providers.GOOGLE;
+            about = "This account is created using google.";
 
         } else if (authorizedClientRegistrationId.equalsIgnoreCase("github")) {
+            String rawEmail = Objects.toString(oauthUser.getAttribute("email"), null);
+            String login = Objects.toString(oauthUser.getAttribute("login"), "unknown");
+            email = rawEmail != null ? rawEmail : login + "@gmail.com";
+            profilePic = Objects.toString(oauthUser.getAttribute("avatar_url"), null);
+            name = login;
+            provider = Providers.GITHUB;
+            about = "This account is created using github";
 
-            // github
-            // github attributes
-            String email = oauthUser.getAttribute("email") != null ? oauthUser.getAttribute("email").toString()
-                    : oauthUser.getAttribute("login").toString() + "@gmail.com";
-            String picture = oauthUser.getAttribute("avatar_url").toString();
-            String name = oauthUser.getAttribute("login").toString();
-            String providerUserId = oauthUser.getName();
+        } else if (authorizedClientRegistrationId.equalsIgnoreCase("linkedin")) {
+            // LinkedIn OAuth - to be implemented
+            logger.info("LinkedIn provider detected - not yet implemented");
 
-            user.setEmail(email);
-            user.setProfilePic(picture);
-            user.setName(name);
-            user.setProviderUserId(providerUserId);
-            user.setProvider(Providers.GITHUB);
-
-            user.setAbout("This account is created using github");
-        }
-
-        else if (authorizedClientRegistrationId.equalsIgnoreCase("linkedin")) {
-
-        }
-
-        else {
+        } else {
             logger.info("OAuthAuthenicationSuccessHandler: Unknown provider");
         }
 
-        // save the user
-        // facebook
-        // facebook attributes
-        // linkedin
+        if (email == null) {
+            logger.error("Could not extract email from OAuth provider: {}", authorizedClientRegistrationId);
+            response.sendRedirect("/login?error=true");
+            return;
+        }
 
-        /*
-         * 
-         * 
-         * 
-         * DefaultOAuth2User user = (DefaultOAuth2User) authentication.getPrincipal();
-         * 
-         * logger.info(user.getName());
-         * 
-         * user.getAttributes().forEach((key, value) -> {
-         * logger.info("{} => {}", key, value);
-         * });
-         * 
-         * logger.info(user.getAuthorities().toString());
-         * 
-         * // data database save:
-         * 
-         * String email = user.getAttribute("email").toString();
-         * String name = user.getAttribute("name").toString();
-         * String picture = user.getAttribute("picture").toString();
-         * 
-         * // create user and save in database
-         * 
-         * User user1 = new User();
-         * user1.setEmail(email);
-         * user1.setName(name);
-         * user1.setProfilePic(picture);
-         * user1.setPassword("password");
-         * user1.setUserId(UUID.randomUUID().toString());
-         * user1.setProvider(Providers.GOOGLE);
-         * user1.setEnabled(true);
-         * 
-         * user1.setEmailVerified(true);
-         * user1.setProviderUserId(user.getName());
-         * user1.setRoleList(List.of(AppConstants.ROLE_USER));
-         * user1.setAbout("This account is created using google..");
-         * 
-         * User user2 = userRepo.findByEmail(email).orElse(null);
-         * if (user2 == null) {
-         * 
-         * userRepo.save(user1);
-         * logger.info("User saved:" + email);
-         * }
-         * 
-         */
+        // Check if user already exists
+        User existingUser = userRepo.findByEmail(email).orElse(null);
+        if (existingUser == null) {
+            // Create new user
+            User user = new User();
+            user.setUserId(UUID.randomUUID().toString());
+            user.setEmail(email);
+            user.setName(name);
+            user.setProfilePic(profilePic);
+            user.setProviderUserId(providerUserId);
+            user.setProvider(provider);
+            user.setAbout(about);
+            user.setEmailVerified(true);
+            user.setEnabled(true);
+            user.setPassword("oauth2-no-password");
 
-        User user2 = userRepo.findByEmail(user.getEmail()).orElse(null);
-        if (user2 == null) {
             UserRole userRole = UserRole.builder()
                     .role(AppConstants.ROLE_USER)
                     .user(user)
                     .build();
             user.setRoles(List.of(userRole));
             userRepo.save(user);
-            System.out.println("user saved:" + user.getEmail());
+            logger.info("New OAuth user saved: {}", email);
+        } else {
+            // Update existing user's profile info from OAuth provider
+            boolean updated = false;
+            if (name != null && !name.equals(existingUser.getName())) {
+                existingUser.setName(name);
+                updated = true;
+            }
+            if (profilePic != null && !profilePic.equals(existingUser.getProfilePic())) {
+                existingUser.setProfilePic(profilePic);
+                updated = true;
+            }
+            if (updated) {
+                userRepo.save(existingUser);
+                logger.info("Updated OAuth user info: {}", email);
+            }
         }
 
         new DefaultRedirectStrategy().sendRedirect(request, response, "/user/profile");
-
     }
-
 }

@@ -1,14 +1,9 @@
 package com.scm.controllers;
 
 import org.slf4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.scm.entities.Contact;
@@ -23,57 +18,58 @@ import jakarta.transaction.Transactional;
 @RequestMapping("/api")
 public class ApiController {
 
-    private Logger logger = org.slf4j.LoggerFactory.getLogger(ApiController.class);
+    private static final Logger logger = LoggerFactory.getLogger(ApiController.class);
 
-    @Autowired
-    private ContactService contactService;
+    private final ContactService contactService;
+    private final EmailService emailService;
+    private final ImageService imageService;
+    private final GroupMemberRepo groupMemberRepo;
 
-    @Autowired
-    private EmailService emailService;
-
-    @Autowired
-    private ImageService imageService;
-
-    @Autowired
-    private GroupMemberRepo groupMemberRepo;
+    public ApiController(ContactService contactService, EmailService emailService,
+            ImageService imageService, GroupMemberRepo groupMemberRepo) {
+        this.contactService = contactService;
+        this.emailService = emailService;
+        this.imageService = imageService;
+        this.groupMemberRepo = groupMemberRepo;
+    }
 
     @GetMapping("/contacts/{contactId}")
     public Contact getContact(@PathVariable String contactId) {
         return contactService.getById(contactId);
     }
 
-    @GetMapping("/contacts/{contactId}/toggle-favorite")
+    // Changed from GET to PUT — toggling favorite mutates data
+    @PutMapping("/contacts/{contactId}/toggle-favorite")
     public Contact toggleFavorite(@PathVariable String contactId) {
         Contact contact = contactService.getById(contactId);
         contact.setFavorite(!contact.isFavorite());
         return contactService.update(contact);
     }
 
-    @GetMapping("/contacts/{contactId}/delete")
+    // Changed from GET to DELETE — deleting a resource should use DELETE method
+    @DeleteMapping("/contacts/{contactId}")
     @Transactional
     public ResponseEntity<String> deleteContact(@PathVariable String contactId) {
         try {
             logger.info("Attempting to delete contact: {}", contactId);
             Contact contact = contactService.getById(contactId);
             logger.info("Contact found: {}", contact.getName());
-            
-            // Delete all group memberships first
-            var groupMembers = groupMemberRepo.findAll().stream()
-                .filter(gm -> gm.getContact() != null && gm.getContact().getId().equals(contactId))
-                .toList();
+
+            // Use repository query instead of loading all members and filtering in Java (N+1 fix)
+            var groupMembers = groupMemberRepo.findByContact_Id(contactId);
             groupMemberRepo.deleteAll(groupMembers);
             logger.info("Deleted {} group memberships", groupMembers.size());
-            
+
             // Try to delete image, but don't fail if it errors
             if (contact.getCloudinaryImagePublicId() != null && !contact.getCloudinaryImagePublicId().isEmpty()) {
                 try {
                     imageService.deleteImage(contact.getCloudinaryImagePublicId());
                     logger.info("Deleted image from Cloudinary: {}", contact.getCloudinaryImagePublicId());
                 } catch (Exception e) {
-                    logger.warn("Failed to delete image from Cloudinary, continuing with contact deletion: {}", e.getMessage());
+                    logger.warn("Failed to delete image from Cloudinary: {}", e.getMessage());
                 }
             }
-            
+
             contactService.delete(contactId);
             logger.info("Contact deleted successfully: {}", contactId);
             return ResponseEntity.ok("Contact deleted successfully");
@@ -93,7 +89,7 @@ public class ApiController {
             logger.info("Attempting to send email to: {}", to);
             logger.info("Subject: {}", subject);
             logger.info("Has attachment: {}", attachment != null && !attachment.isEmpty());
-            
+
             if (attachment != null && !attachment.isEmpty()) {
                 emailService.sendEmailWithAttachment(to, subject, message, attachment);
             } else {
@@ -106,5 +102,4 @@ public class ApiController {
             return ResponseEntity.status(500).body("Failed to send email: " + e.getMessage());
         }
     }
-
 }

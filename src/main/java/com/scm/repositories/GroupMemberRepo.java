@@ -17,4 +17,6 @@ public interface GroupMemberRepo extends JpaRepository<GroupMember, String> {
     boolean existsByGroup_GroupIdAndContact_Id(String groupId, String contactId);
     
     void deleteByGroup_GroupIdAndContact_Id(String groupId, String contactId);
+
+    List<GroupMember> findByContact_Id(String contactId);
 }

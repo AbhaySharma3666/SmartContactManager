@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,16 +19,17 @@ import com.scm.repositories.GroupRepo;
 @Service
 public class GroupService {
 
-    @Autowired
-    private GroupRepo groupRepo;
+    private final GroupRepo groupRepo;
+    private final GroupMemberRepo memberRepo;
+    private final ContactRepo contactRepo;
 
-    @Autowired
-    private GroupMemberRepo memberRepo;
-    
-    @Autowired
-    private ContactRepo contactRepo;
+    public GroupService(GroupRepo groupRepo, GroupMemberRepo memberRepo, ContactRepo contactRepo) {
+        this.groupRepo = groupRepo;
+        this.memberRepo = memberRepo;
+        this.contactRepo = contactRepo;
+    }
 
-    public ContactGroup createGroup(String name, String desc, User user){
+    public ContactGroup createGroup(String name, String desc, User user) {
         ContactGroup g = new ContactGroup();
         g.setGroupId(UUID.randomUUID().toString());
         g.setName(name);
@@ -39,32 +39,32 @@ public class GroupService {
         return groupRepo.save(g);
     }
 
-    public List<ContactGroup> getUserGroups(User user){
+    public List<ContactGroup> getUserGroups(User user) {
         return groupRepo.findByUser(user);
     }
 
-    public long getMemberCount(String groupId){
+    public long getMemberCount(String groupId) {
         return memberRepo.countByGroup_GroupId(groupId);
     }
 
-    public void deleteGroup(String groupId){
+    public void deleteGroup(String groupId) {
         groupRepo.deleteById(groupId);
     }
-    
-    public Optional<ContactGroup> getGroupById(String groupId){
+
+    public Optional<ContactGroup> getGroupById(String groupId) {
         return groupRepo.findById(groupId);
     }
-    
-    public ContactGroup updateGroup(ContactGroup group){
+
+    public ContactGroup updateGroup(ContactGroup group) {
         return groupRepo.save(group);
     }
-    
+
     @Transactional
-    public void addMember(String groupId, String contactId){
+    public void addMember(String groupId, String contactId) {
         ContactGroup group = groupRepo.findById(groupId).orElseThrow();
         Contact contact = contactRepo.findById(contactId).orElseThrow();
-        
-        if(!memberRepo.existsByGroup_GroupIdAndContact_Id(groupId, contactId)){
+
+        if (!memberRepo.existsByGroup_GroupIdAndContact_Id(groupId, contactId)) {
             GroupMember member = new GroupMember();
             member.setGroup(group);
             member.setContact(contact);
@@ -72,13 +72,13 @@ public class GroupService {
             memberRepo.save(member);
         }
     }
-    
+
     @Transactional
-    public void removeMember(String groupId, String contactId){
+    public void removeMember(String groupId, String contactId) {
         memberRepo.deleteByGroup_GroupIdAndContact_Id(groupId, contactId);
     }
-    
-    public List<GroupMember> getGroupMembers(String groupId){
+
+    public List<GroupMember> getGroupMembers(String groupId) {
         return memberRepo.findByGroup_GroupId(groupId);
     }
 }

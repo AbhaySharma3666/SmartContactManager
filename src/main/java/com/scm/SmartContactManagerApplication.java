@@ -1,11 +1,11 @@
 package com.scm;
 
-import com.scm.config.AppConfig;
 import com.scm.entities.User;
 import com.scm.entities.UserRole;
 import com.scm.helpers.AppConstants;
-import com.scm.helpers.RoleHelper;
 import com.scm.repositories.UserRepo;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -17,6 +17,8 @@ import java.util.UUID;
 
 @SpringBootApplication
 public class SmartContactManagerApplication implements CommandLineRunner {
+
+	private static final Logger logger = LoggerFactory.getLogger(SmartContactManagerApplication.class);
 
 	public static void main(String[] args) {
 		SpringApplication.run(SmartContactManagerApplication.class, args);
@@ -47,10 +49,7 @@ public class SmartContactManagerApplication implements CommandLineRunner {
 					.build();
 			user.setRoles(List.of(userRole));
 			userRepo.save(user);
-			System.out.println("user created");
+			logger.info("Default admin user created");
 		});
-
-
 	}
-
 }

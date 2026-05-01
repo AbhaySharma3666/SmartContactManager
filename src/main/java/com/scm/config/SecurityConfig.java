@@ -1,11 +1,9 @@
 package com.scm.config;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -14,132 +12,79 @@ import com.scm.services.impl.SecurityCustomUserDetailService;
 @Configuration
 public class SecurityConfig {
 
-    // user create and login using java code with in memory service
+    private final SecurityCustomUserDetailService userDetailService;
+    private final OAuthAuthenicationSuccessHandler handler;
+    private final AuthFailtureHandler authFailtureHandler;
 
-    // @Bean
-    // public UserDetailsService userDetailsService() {
+    public SecurityConfig(SecurityCustomUserDetailService userDetailService,
+            OAuthAuthenicationSuccessHandler handler,
+            AuthFailtureHandler authFailtureHandler) {
+        this.userDetailService = userDetailService;
+        this.handler = handler;
+        this.authFailtureHandler = authFailtureHandler;
+    }
 
-    // UserDetails user1 = User
-    // .withDefaultPasswordEncoder()
-    // .username("admin123")
-    // .password("admin123")
-    // .roles("ADMIN", "USER")
-    // .build();
-
-    // UserDetails user2 = User
-    // .withDefaultPasswordEncoder()
-    // .username("user123")
-    // .password("password")
-    // // .roles(null)
-    // .build();
-
-    // var inMemoryUserDetailsManager = new InMemoryUserDetailsManager(user1,
-    // user2);
-    // return inMemoryUserDetailsManager;
-
-    // }
-
-    @Autowired
-    private SecurityCustomUserDetailService userDetailService;
-
-    @Autowired
-    private OAuthAuthenicationSuccessHandler handler;
-
-    @Autowired
-    private AuthFailtureHandler authFailtureHandler;
-
-    // configuraiton of authentication providerfor spring security
+    // configuration of authentication provider for spring security
     @Bean
-public DaoAuthenticationProvider authenticationProvider() {
-    DaoAuthenticationProvider provider =
-            new DaoAuthenticationProvider(userDetailService);
-    provider.setPasswordEncoder(passwordEncoder());
-    return provider;
-}
+    public DaoAuthenticationProvider authenticationProvider() {
+        DaoAuthenticationProvider provider =
+                new DaoAuthenticationProvider(userDetailService);
+        provider.setPasswordEncoder(passwordEncoder());
+        return provider;
+    }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
 
-        // configuration
-
-        // urls configure kiay hai ki koun se public rangenge aur koun se private
-        // rangenge
+        // URL authorization: authenticated vs public
         httpSecurity.authorizeHttpRequests(authorize -> {
-            // authorize.requestMatchers("/home", "/register", "/services").permitAll();
             authorize.requestMatchers("/user/**").authenticated();
             authorize.requestMatchers("/api/**").authenticated();
             authorize.anyRequest().permitAll();
         });
 
-        // form default login
-        // agar hame kuch bhi change karna hua to hama yaha ayenge: form login se
-        // related
+        // Form login configuration
         httpSecurity.formLogin(formLogin -> {
-
-            //
             formLogin.loginPage("/login");
             formLogin.loginProcessingUrl("/authenticate");
-            formLogin.successForwardUrl("/user/profile");
-            // formLogin.failureForwardUrl("/login?error=true");
-            // formLogin.defaultSuccessUrl("/home");
+            // Use defaultSuccessUrl (redirect) instead of successForwardUrl (server forward)
+            // successForwardUrl does a POST forward which fails on GET-mapped handlers
+            formLogin.defaultSuccessUrl("/user/profile", true);
             formLogin.usernameParameter("email");
             formLogin.passwordParameter("password");
-
-            // formLogin.failureHandler(new AuthenticationFailureHandler() {
-
-            // @Override
-            // public void onAuthenticationFailure(HttpServletRequest request,
-            // HttpServletResponse response,
-            // AuthenticationException exception) throws IOException, ServletException {
-            // // TODO Auto-generated method stub
-            // throw new UnsupportedOperationException("Unimplemented method
-            // 'onAuthenticationFailure'");
-            // }
-
-            // });
-
-            // formLogin.successHandler(new AuthenticationSuccessHandler() {
-
-            // @Override
-            // public void onAuthenticationSuccess(HttpServletRequest request,
-            // HttpServletResponse response,
-            // Authentication authentication) throws IOException, ServletException {
-            // // TODO Auto-generated method stub
-            // throw new UnsupportedOperationException("Unimplemented method
-            // 'onAuthenticationSuccess'");
-            // }
-
-            // });
             formLogin.failureHandler(authFailtureHandler);
-
         });
 
         httpSecurity.csrf(csrf -> csrf
             .ignoringRequestMatchers("/api/**")
+            // Also ignore CSRF for logout since we use a GET link
+            .ignoringRequestMatchers("/do-logout")
         );
-        // oauth configurations
 
+        // OAuth2 configuration
         httpSecurity.oauth2Login(oauth -> {
             oauth.loginPage("/login");
             oauth.successHandler(handler);
         });
 
+        // Logout configuration
         httpSecurity.logout(logoutForm -> {
             logoutForm.logoutUrl("/do-logout");
             logoutForm.logoutSuccessUrl("/login?logout=true");
+            logoutForm.invalidateHttpSession(true);
+            logoutForm.deleteCookies("JSESSIONID");
         });
 
-        // Prevent back button after logout
+        // Prevent back button after logout by setting proper cache headers
         httpSecurity.headers(headers -> headers
-            .cacheControl(cache -> cache.disable())
+            .cacheControl(cache -> {}) // Sets Cache-Control: no-cache, no-store, must-revalidate
         );
 
         return httpSecurity.build();
-
     }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder(5);
+        return new BCryptPasswordEncoder();
     }
 }

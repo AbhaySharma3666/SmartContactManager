@@ -2,7 +2,8 @@ package com.scm.services.impl;
 
 import java.io.IOException;
 
-import java.util.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -15,7 +16,9 @@ import com.scm.services.ImageService;
 @Service
 public class ImageServiceImpl implements ImageService {
 
-    private Cloudinary cloudinary;
+    private static final Logger logger = LoggerFactory.getLogger(ImageServiceImpl.class);
+
+    private final Cloudinary cloudinary;
 
     public ImageServiceImpl(Cloudinary cloudinary) {
         this.cloudinary = cloudinary;
@@ -23,28 +26,21 @@ public class ImageServiceImpl implements ImageService {
 
     @Override
     public String uploadImage(MultipartFile contactImage, String filename) {
-
-        // code likhnaa hia jo image ko upload kar rha ho
-
         try {
-            byte[] data = new byte[contactImage.getInputStream().available()];
-            contactImage.getInputStream().read(data);
+            // Use getBytes() instead of getInputStream() to avoid leaked streams
+            byte[] data = contactImage.getBytes();
             cloudinary.uploader().upload(data, ObjectUtils.asMap(
                     "public_id", filename));
 
             return this.getUrlFromPublicId(filename);
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("Failed to upload image: {}", e.getMessage(), e);
             return null;
         }
-
-        // and return raha hoga : url
-
     }
 
     @Override
     public String getUrlFromPublicId(String publicId) {
-
         return cloudinary
                 .url()
                 .transformation(
@@ -53,7 +49,6 @@ public class ImageServiceImpl implements ImageService {
                                 .height(AppConstants.CONTACT_IMAGE_HEIGHT)
                                 .crop(AppConstants.CONTACT_IMAGE_CROP))
                 .generate(publicId);
-
     }
 
     @Override
@@ -61,8 +56,7 @@ public class ImageServiceImpl implements ImageService {
         try {
             cloudinary.uploader().destroy(publicId, ObjectUtils.emptyMap());
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Failed to delete image: {}", e.getMessage(), e);
         }
     }
-
 }

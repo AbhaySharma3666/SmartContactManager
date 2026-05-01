@@ -1,9 +1,12 @@
 package com.scm.controllers;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
@@ -16,14 +19,16 @@ import com.scm.services.UserService;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-
 @Controller
 public class PageController {
 
-    @Autowired
-    private UserService userService;
+    private static final Logger logger = LoggerFactory.getLogger(PageController.class);
+
+    private final UserService userService;
+
+    public PageController(UserService userService) {
+        this.userService = userService;
+    }
 
     @GetMapping("/")
     public String index() {
@@ -32,65 +37,49 @@ public class PageController {
 
     @RequestMapping("/home")
     public String home(Model model) {
-        System.out.println("Home page handler");
-        // sending data to view
+        logger.info("Home page handler");
         model.addAttribute("name", "Substring Technologies");
         model.addAttribute("youtubeChannel", "Learn Code With Abhay");
         model.addAttribute("githubRepo", "https://github.com/abhaysharma3666/");
         return "home";
     }
 
-    // about route
-
     @RequestMapping("/about")
     public String aboutPage(Model model) {
         model.addAttribute("isLogin", true);
-        System.out.println("About page loading");
+        logger.info("About page loading");
         return "about";
     }
 
-    // services
-
     @RequestMapping("/services")
     public String servicesPage() {
-        System.out.println("services page loading");
+        logger.info("Services page loading");
         return "services";
     }
 
-    // contact page
-
     @GetMapping("/contact")
     public String contact() {
-        return new String("contact");
+        return "contact";
     }
 
-    // this is showing login page
     @GetMapping("/login")
     public String login() {
-        return new String("login");
+        return "login";
     }
 
-    // registration page
     @GetMapping("/register")
     public String register(Model model) {
-
         UserForm userForm = new UserForm();
         model.addAttribute("userForm", userForm);
-
         return "register";
     }
-
-    // processing register
 
     @RequestMapping(value = "/do-register", method = RequestMethod.POST)
     public String processRegister(@Valid @ModelAttribute UserForm userForm, BindingResult rBindingResult,
             HttpSession session) {
-        System.out.println("Processing registration");
-        // fetch form data
-        // UserForm
-        System.out.println(userForm);
+        logger.info("Processing registration");
+        logger.info("UserForm: {}", userForm);
 
-        // validate form data
         if (rBindingResult.hasErrors()) {
             return "register";
         }
@@ -109,23 +98,16 @@ public class PageController {
         user.setAbout(userForm.getAbout());
         user.setPhoneNumber(userForm.getPhoneNumber());
         user.setEnabled(false);
-        user.setProfilePic(
-                "https://cdn-icons-png.flaticon.com/512/3135/3135715.png");
+        user.setProfilePic("https://cdn-icons-png.flaticon.com/512/3135/3135715.png");
 
-        User savedUser = userService.saveUser(user);
+        userService.saveUser(user);
+        logger.info("User saved successfully");
 
-        System.out.println("user saved :");
-
-        // message = "Registration Successful"
-
-        // add the message:
-
-        Message message = Message.builder().content("Registration Successful! Verification email sent to " + userForm.getEmail()).type(MessageType.green).build();
-
+        Message message = Message.builder()
+                .content("Registration Successful! Verification email sent to " + userForm.getEmail())
+                .type(MessageType.green).build();
         session.setAttribute("message", message);
 
-        // redirectto login page
         return "redirect:/login";
     }
-
 }

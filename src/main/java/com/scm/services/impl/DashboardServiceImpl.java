@@ -1,6 +1,5 @@
 package com.scm.services.impl;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.scm.entities.Contact;
@@ -15,20 +14,22 @@ import java.util.List;
 @Service
 public class DashboardServiceImpl implements DashboardService {
 
-    @Autowired
-    private ContactRepo contactRepo;
+    private final ContactRepo contactRepo;
+    private final GroupRepo groupRepo;
 
-    @Autowired
-    private GroupRepo groupRepo;
+    public DashboardServiceImpl(ContactRepo contactRepo, GroupRepo groupRepo) {
+        this.contactRepo = contactRepo;
+        this.groupRepo = groupRepo;
+    }
 
     @Override
     public DashboardStats getDashboardStats(User user) {
         long totalContacts = contactRepo.countByUser(user);
         long favoriteContacts = contactRepo.countByUserAndFavorite(user, true);
         long totalGroups = groupRepo.countByUser(user);
-        
+
         List<Contact> recentContacts = contactRepo.findTop5ByUserOrderByIdDesc(user);
-        
+
         return new DashboardStats(totalContacts, favoriteContacts, totalGroups, recentContacts);
     }
 }
